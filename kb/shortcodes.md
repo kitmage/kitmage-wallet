@@ -189,8 +189,12 @@ Safely embed booking UI that is automatically hidden/replaced when the user cann
    - renders this Fluent Booking shortcode:
 
 ```text
-[fluent_booking calendar_id="{calendar_id}" event_id="{event_id}"]
+[fluent_booking id="{event_id}"]
 ```
+
+Fluent Booking identifies the event with its `id` attribute. The `calendar_id`
+attribute on `[wallet_booking]` is validated by Aspen Wallet but is not forwarded
+to Fluent Booking.
 
 ### Example usage
 
@@ -239,4 +243,3 @@ If shortcode output is blank or unexpected:
 - Prefer explicit `fallback` messages for clearer UX.
 - Use `[wallet_if]` around expensive UI blocks to avoid showing inaccessible actions.
 - Use `[wallet_balance]` near booking CTAs to reduce confusion.
-

@@ -174,7 +174,7 @@ Registered shortcodes (`aspen_wallet_register_shortcode_hooks()`):
 - `[wallet_if bucket="" min="" max="" equals="" fallback=""]...[/wallet_if]`
   - Evaluates integer conditions on the effective wallet user's balance; renders enclosed content or fallback.
 - `[wallet_booking calendar_id="0" event_id="0" fallback=""]`
-  - Runs wallet affordability check before rendering `[fluent_booking ...]`; filterable via `aspen_wallet_booking_shortcode_output`.
+  - Runs wallet affordability check before rendering `[fluent_booking id="{event_id}"]`; filterable via `aspen_wallet_booking_shortcode_output`.
 
 Restriction impact:
 - Booking/calendar output can be replaced by fallback in:

@@ -180,8 +180,7 @@ function aspen_wallet_shortcode_booking( $atts ) {
 	}
 
 	$booking_shortcode = sprintf(
-		'[fluent_booking calendar_id="%d" event_id="%d"]',
-		$calendar_id,
+		'[fluent_booking id="%d"]',
 		$event_id
 	);
 	$output = do_shortcode( $booking_shortcode );
