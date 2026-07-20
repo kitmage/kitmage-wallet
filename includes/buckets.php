@@ -63,11 +63,11 @@ function aspen_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
 	$original_slug = aspen_wallet_sanitize_bucket_slug( $original_slug );
 
 	if ( '' === $slug ) {
-		return new WP_Error( 'invalid_slug', __( 'Bucket slug is required.', 'aspen-wallet' ) );
+		return new WP_Error( 'invalid_slug', __( 'Fund slug is required.', 'aspen-wallet' ) );
 	}
 
 	if ( ! preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug ) ) {
-		return new WP_Error( 'invalid_slug_format', __( 'Bucket slug must be lowercase kebab-case (letters, numbers, and hyphens only).', 'aspen-wallet' ) );
+		return new WP_Error( 'invalid_slug_format', __( 'Fund slug must be lowercase kebab-case (letters, numbers, and hyphens only).', 'aspen-wallet' ) );
 	}
 
 	if ( '' === $label ) {
@@ -90,7 +90,7 @@ function aspen_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
 		}
 
 		if ( $existing['slug'] === $slug && $existing['slug'] !== $original_slug ) {
-			return new WP_Error( 'duplicate_slug', __( 'Bucket slug already exists.', 'aspen-wallet' ) );
+			return new WP_Error( 'duplicate_slug', __( 'Fund slug already exists.', 'aspen-wallet' ) );
 		}
 
 		$next[] = $existing;
@@ -111,12 +111,12 @@ function aspen_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
 function aspen_wallet_delete_bucket( $slug ) {
 	$slug = aspen_wallet_sanitize_bucket_slug( $slug );
 	if ( '' === $slug ) {
-		return new WP_Error( 'invalid_slug', __( 'Bucket slug is required.', 'aspen-wallet' ) );
+		return new WP_Error( 'invalid_slug', __( 'Fund slug is required.', 'aspen-wallet' ) );
 	}
 
 	$references = aspen_wallet_get_bucket_references( $slug );
 	if ( ! empty( $references['product_grants'] ) || ! empty( $references['event_rules'] ) ) {
-		return new WP_Error( 'bucket_in_use', __( 'Bucket is referenced by wallet product grants or booking event rules.', 'aspen-wallet' ) );
+		return new WP_Error( 'bucket_in_use', __( 'Fund is referenced by wallet product grants or booking event rules.', 'aspen-wallet' ) );
 	}
 
 	$buckets = aspen_wallet_get_buckets();
@@ -132,7 +132,7 @@ function aspen_wallet_delete_bucket( $slug ) {
 	}
 
 	if ( ! $found ) {
-		return new WP_Error( 'not_found', __( 'Bucket not found.', 'aspen-wallet' ) );
+		return new WP_Error( 'not_found', __( 'Fund not found.', 'aspen-wallet' ) );
 	}
 
 	update_option( ASPEN_WALLET_BUCKETS_OPTION_KEY, array_values( $next ), false );

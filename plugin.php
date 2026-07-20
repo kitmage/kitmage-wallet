@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Aspen Wallet
- * Description: Bucketed credit wallet for WooCommerce, WooCommerce Subscriptions, Fluent Booking, and FluentCRM.
- * Version: 0.1.1
+ * Description: A fund-based credit wallet for WooCommerce, WooCommerce Subscriptions, Fluent Booking, and FluentCRM.
+ * Version: 0.1.2
  * Author: Aspen Wallet
  * Text Domain: aspen-wallet
  */
@@ -20,7 +20,7 @@ if ( ! defined( 'ASPEN_WALLET_PATH' ) ) {
 }
 
 if ( ! defined( 'ASPEN_WALLET_VERSION' ) ) {
-	define( 'ASPEN_WALLET_VERSION', '0.1.1' );
+	define( 'ASPEN_WALLET_VERSION', '0.1.2' );
 }
 
 /**
