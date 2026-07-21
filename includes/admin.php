@@ -13,8 +13,8 @@ function aspen_wallet_register_admin_hooks() {
 function aspen_wallet_register_admin_menu() {
 	add_submenu_page(
 		'aspen-wallet-users',
-		__( 'Wallet', 'aspen-wallet' ),
-		__( 'Wallet', 'aspen-wallet' ),
+		__( 'Fund Types', 'aspen-wallet' ),
+		__( 'Fund Types', 'aspen-wallet' ),
 		'manage_options',
 		'aspen-wallet',
 		'aspen_wallet_render_admin_page'
@@ -57,7 +57,7 @@ function aspen_wallet_render_admin_page() {
 	$buckets = aspen_wallet_get_buckets();
 	?>
 	<div class="wrap">
-		<h1><?php echo esc_html__( 'Wallet Funds', 'aspen-wallet' ); ?></h1>
+		<h1><?php echo esc_html__( 'Fund Types', 'aspen-wallet' ); ?></h1>
 		<p class="description"><?php echo esc_html__( 'Each fund holds a separate credit balance in a user’s Wallet.', 'aspen-wallet' ); ?></p>
 		<?php foreach ( $errors as $error ) : ?>
 			<div class="notice notice-error"><p><?php echo esc_html( $error ); ?></p></div>
