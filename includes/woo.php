@@ -259,11 +259,11 @@ function aspen_wallet_woo_render_wallet_grants_panel( $field_name, $grants, $uni
 	wp_nonce_field( 'aspen_wallet_save_product_grants', ASPEN_WALLET_PRODUCT_GRANTS_NONCE );
 
 	echo '<p><strong>' . esc_html__( 'Wallet Credits', 'aspen-wallet' ) . '</strong></p>';
-	echo '<p class="description">' . esc_html__( 'Each row grants credits to a bucket. Subscription reset rows set the balance on renewal; one-time grant rows add balance when order completes.', 'aspen-wallet' ) . '</p>';
+	echo '<p class="description">' . esc_html__( 'Each row grants Credits to a Fund. Subscription reset rows set the Fund’s Credits on renewal; one-time grant rows add Credits when an order completes.', 'aspen-wallet' ) . '</p>';
 	echo '<table class="widefat striped" style="max-width:900px">';
 	echo '<thead><tr>';
-	echo '<th>' . esc_html__( 'Bucket', 'aspen-wallet' ) . '</th>';
-	echo '<th>' . esc_html__( 'Amount', 'aspen-wallet' ) . '</th>';
+	echo '<th>' . esc_html__( 'Fund', 'aspen-wallet' ) . '</th>';
+	echo '<th>' . esc_html__( 'Credits', 'aspen-wallet' ) . '</th>';
 	echo '<th>' . esc_html__( 'Type', 'aspen-wallet' ) . '</th>';
 	echo '</tr></thead><tbody>';
 
@@ -274,7 +274,7 @@ function aspen_wallet_woo_render_wallet_grants_panel( $field_name, $grants, $uni
 
 		echo '<tr>';
 		echo '<td><select name="' . esc_attr( $field_name ) . '[' . absint( $index ) . '][bucket]">';
-		echo '<option value="">' . esc_html__( 'Select bucket', 'aspen-wallet' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'Select Fund', 'aspen-wallet' ) . '</option>';
 		foreach ( $bucket_options as $slug => $label ) {
 			echo '<option value="' . esc_attr( $slug ) . '" ' . selected( $bucket, $slug, false ) . '>' . esc_html( $label ) . '</option>';
 		}
@@ -294,7 +294,7 @@ function aspen_wallet_woo_render_wallet_grants_panel( $field_name, $grants, $uni
 	$index     = count( $grants );
 	echo '<tr>';
 	echo '<td><select name="' . esc_attr( $field_name ) . '[' . absint( $index ) . '][bucket]">';
-	echo '<option value="">' . esc_html__( 'Select bucket', 'aspen-wallet' ) . '</option>';
+	echo '<option value="">' . esc_html__( 'Select Fund', 'aspen-wallet' ) . '</option>';
 	foreach ( $bucket_options as $slug => $label ) {
 		echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $label ) . '</option>';
 	}

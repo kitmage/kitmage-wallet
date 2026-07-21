@@ -27,25 +27,29 @@ function aspen_wallet_sanitize_shortcode_fallback( $fallback ) {
 }
 
 function aspen_wallet_shortcode_balance( $atts ) {
+	$raw_atts = (array) $atts;
 	$atts = shortcode_atts(
 		array(
+			'fund'      => '',
+			// Deprecated alias retained for published shortcode compatibility.
 			'bucket'    => '',
 			'divide_by' => 1,
 			'decimals'  => 0,
 			'suffix'    => '',
 		),
-		(array) $atts,
+		$raw_atts,
 		'wallet_balance'
 	);
 
-	$bucket = aspen_wallet_sanitize_bucket_slug( $atts['bucket'] );
-	if ( '' === $bucket || ! aspen_wallet_get_bucket_by_slug( $bucket ) ) {
+	$fund_input = '' !== (string) $atts['fund'] ? $atts['fund'] : $atts['bucket'];
+	$fund       = aspen_wallet_sanitize_bucket_slug( $fund_input );
+	if ( '' === $fund || ! aspen_wallet_get_bucket_by_slug( $fund ) ) {
 		return '';
 	}
 
 	$user_id        = get_current_user_id();
 	$wallet_user_id = aspen_wallet_get_effective_wallet_user_id( $user_id );
-	$amount         = wallet_get_balance( $wallet_user_id, $bucket );
+	$amount         = wallet_get_balance( $wallet_user_id, $fund );
 
 	$divide_by = aspen_wallet_to_int( $atts['divide_by'] );
 	$decimals  = min( 6, aspen_wallet_to_int( $atts['decimals'] ) );
@@ -65,15 +69,18 @@ function aspen_wallet_shortcode_balance( $atts ) {
 }
 
 function aspen_wallet_shortcode_if( $atts, $content = '' ) {
+	$raw_atts = (array) $atts;
 	$atts = shortcode_atts(
 		array(
+			'fund'     => '',
+			// Deprecated alias retained for published shortcode compatibility.
 			'bucket'   => '',
 			'min'      => null,
 			'max'      => null,
 			'equals'   => null,
 			'fallback' => '',
 		),
-		(array) $atts,
+		$raw_atts,
 		'wallet_if'
 	);
 
@@ -98,11 +105,11 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 		$has_rule             = true;
 	}
 
-	$bucket_input = isset( $atts['bucket'] ) ? wp_unslash( (string) $atts['bucket'] ) : '';
-	$bucket_input = sanitize_text_field( $bucket_input );
-	$bucket_input = trim( $bucket_input );
+	$fund_input = '' !== (string) $atts['fund'] ? $atts['fund'] : $atts['bucket'];
+	$fund_input = sanitize_text_field( wp_unslash( (string) $fund_input ) );
+	$fund_input = trim( $fund_input );
 
-	if ( '' === $bucket_input ) {
+	if ( '' === $fund_input ) {
 		$balance = 0;
 		foreach ( aspen_wallet_get_buckets() as $bucket ) {
 			if ( empty( $bucket['slug'] ) ) {
@@ -111,7 +118,7 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 			$balance += wallet_get_balance( $wallet_user_id, $bucket['slug'] );
 		}
 	} else {
-		$raw_buckets = explode( ',', $bucket_input );
+		$raw_buckets = explode( ',', $fund_input );
 		$buckets     = aspen_wallet_normalize_bucket_list( $raw_buckets );
 
 		if ( empty( $buckets ) ) {

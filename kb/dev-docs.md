@@ -1,7 +1,7 @@
 # Aspen Wallet Developer Docs
 
 ## Purpose & Scope
-Aspen Wallet is a **bucketed credits wallet** plugin that tracks integer credit balances per user bucket and applies/restricts credits across connected systems (`plugin.php` / `aspen_wallet_bootstrap()`).
+Aspen Wallet gives each user a **Wallet containing Funds**, with each Fund holding an integer number of Credits. It applies and restricts those Credits across connected systems (`plugin.php` / `aspen_wallet_bootstrap()`).
 
 Supported integrations in current code paths:
 - WooCommerce grants (`includes/woo.php` / `aspen_wallet_register_woo_hooks()`).
@@ -35,7 +35,7 @@ Bootstrap sequence (`plugin.php` / `aspen_wallet_bootstrap()`):
    - `aspen_wallet_register_shortcode_hooks()`
 
 ## Data Model
-- Bucket registry option key: `ASPEN_WALLET_BUCKETS_OPTION_KEY` = `aspen_wallet_buckets`, with legacy fallback to `wallet_buckets` (`includes/buckets.php` / `aspen_wallet_get_buckets()`).
+- Fund registry option key: `ASPEN_WALLET_BUCKETS_OPTION_KEY` = `aspen_wallet_buckets`, with legacy fallback to `wallet_buckets` (`includes/buckets.php` / `aspen_wallet_get_buckets()`). Internal `bucket` identifiers are retained for backward compatibility (`includes/buckets.php` / `aspen_wallet_get_buckets()`).
 - User-meta balances: `_user_wallet_bucket_{slug}` via `aspen_wallet_bucket_meta_key()`; slug hyphens are converted to underscores (`includes/balances.php`).
 - Fluent Booking event meta keys (`includes/fluent-booking.php`):
   - `_aspen_wallet_enabled`
@@ -70,22 +70,22 @@ Teams for WooCommerce Memberships compatibility:
 - Fired from `wallet_set_balance()`.
 - Signature: `(int $user_id, string $bucket, int $old, int $new, string $context)` where context is currently `'set_balance'`.
 
-## Bucket Management & Validation (`includes/buckets.php`, `includes/admin.php`)
+## Fund Management & Validation (`includes/buckets.php`, `includes/admin.php`)
 - Slugs are normalized with `aspen_wallet_sanitize_bucket_slug()` (`sanitize_title`) and must pass kebab-case regex `^[a-z0-9]+(?:-[a-z0-9]+)*$` in `aspen_wallet_upsert_bucket()`.
 - Upsert behavior (`aspen_wallet_upsert_bucket()`):
   - If `original_slug` matches an existing row, updates that row (supports rename).
   - If target slug already exists on another row, returns `WP_Error( 'duplicate_slug' )`.
-  - Otherwise appends new bucket.
+  - Otherwise appends a new Fund.
 - Delete guard (`aspen_wallet_delete_bucket()`):
   - Calls `aspen_wallet_get_bucket_references()`.
-  - Blocks deletion when bucket is referenced by Woo grants (`product_grants`) or Fluent Booking event rules (`event_rules`).
+  - Blocks deletion when a Fund is referenced by Woo grants (`product_grants`) or Fluent Booking event rules (`event_rules`).
 - Admin notices/redirect encoding:
   - Redirect args `wallet_errors` / `wallet_success` are pipe-delimited for multiple messages.
   - Parsing uses `rawurldecode` + `explode('|', ...)` + `sanitize_text_field` in `aspen_wallet_parse_notice_messages()`.
 
 ## Admin UX & Permissions Matrix
 Capabilities:
-- Bucket config page: `manage_options` (`includes/admin.php`).
+- Fund config page: `manage_options` (`includes/admin.php`).
 - Wallet user menu/pages: `edit_users` (`includes/admin-wallet-users.php`).
 - Profile editing wallet section/save: `edit_user` per target user (`includes/admin-wallet-users.php`).
 
@@ -133,22 +133,22 @@ Processed renewal tracking:
 - Max history retained: 30 order IDs.
 
 Reset grants aggregation + apply timing:
-- Aggregation by bucket in `aspen_wallet_get_subscription_reset_grants()` (last matching line item per bucket wins).
+- Aggregation by Fund in `aspen_wallet_get_subscription_reset_grants()` (last matching line item per Fund wins).
 - Applied during renewal-success handler by `wallet_set_balance( $user_id, $bucket, $amount )`.
 
 Sequence:
 1. Renewal event fires.
 2. Resolve subscription + renewal order ID.
-3. Aggregate `subscription_reset` grants by bucket.
+3. Aggregate `subscription_reset` grants by Fund.
 4. Check duplicate renewal ID.
-5. Apply bucket resets.
+5. Apply Fund resets.
 6. Mark renewal as processed.
 
 ## Fluent Booking Restriction Flow (`includes/fluent-booking.php`)
 Event settings UI + storage:
 - UI fields rendered in `aspen_wallet_render_fluent_booking_event_wallet_settings()`.
 - Saved in `aspen_wallet_save_fluent_booking_event_wallet_settings()` with nonce `aspen_wallet_save_fluent_booking_event_settings`.
-- Stores enabled/cost/allowed buckets in event post meta keys.
+- Stores enabled, cost, and allowed Funds in event post meta keys (whose internal names retain `buckets` for compatibility).
 
 Affordability checks + fallback behavior:
 - Central check: `aspen_wallet_fluent_booking_affordability()`.
@@ -169,9 +169,9 @@ Failure action payload:
 
 ## Shortcodes & Front-End Behavior (`includes/shortcodes.php`)
 Registered shortcodes (`aspen_wallet_register_shortcode_hooks()`):
-- `[wallet_balance bucket="" divide_by="1" decimals="0" suffix=""]`
-  - Reads the effective wallet user's bucket balance; returns escaped string (raw int or formatted).
-- `[wallet_if bucket="" min="" max="" equals="" fallback=""]...[/wallet_if]`
+- `[wallet_balance fund="" divide_by="1" decimals="0" suffix=""]`
+  - Reads the Credits in the effective Wallet user's Fund; returns an escaped string (raw int or formatted). The deprecated `bucket` attribute remains an alias for backward compatibility.
+- `[wallet_if fund="" min="" max="" equals="" fallback=""]...[/wallet_if]`
   - Evaluates integer conditions on the effective wallet user's balance; renders enclosed content or fallback.
 - `[wallet_booking calendar_id="0" event_id="0" fallback=""]`
   - Runs wallet affordability check before rendering `[fluent_booking id="{event_id}"]`; filterable via `aspen_wallet_booking_shortcode_output`.
@@ -198,12 +198,12 @@ Restriction impact:
 | `aspen_wallet_effective_wallet_user_id` | `$wallet_user_id, $user_id, $selected_team, $teams` | `aspen_wallet_get_effective_wallet_user_id()` | Override which user wallet backs a logged-in user, especially for multi-team sites. |
 
 ## Operational Runbook
-- **Add a new bucket safely**
+- **Add a new Fund safely**
   1. Create via Wallet admin form (`includes/admin.php` / `aspen_wallet_handle_save_buckets()`).
   2. Confirm slug passes kebab-case validation (`includes/buckets.php` / `aspen_wallet_upsert_bucket()`).
-  3. Confirm bucket appears in Woo grant selectors and Fluent Booking allowed buckets lists (`includes/woo.php`, `includes/fluent-booking.php`).
+  3. Confirm the Fund appears in Woo grant selectors and Fluent Booking allowed Funds lists (`includes/woo.php`, `includes/fluent-booking.php`).
 
-- **Migrate/rename bucket slugs**
+- **Migrate/rename Fund slugs**
   1. Use edit flow with `original_slug` (`includes/admin.php` form + handler).
   2. Understand balance meta key changes with slug (`includes/balances.php` / `aspen_wallet_bucket_meta_key()`).
   3. Check references using `aspen_wallet_get_bucket_references()` before deleting old slug entry.
@@ -229,4 +229,4 @@ Restriction impact:
 - Follow existing sanitization/escaping patterns (`sanitize_text_field`, `sanitize_textarea_field`, `sanitize_key`, `esc_html`, `esc_attr`, `esc_url`, `wp_kses_post`, `wp_unslash`).
 - Every new admin form must enforce capability checks + nonce validation (mirror patterns in `includes/admin.php` and `includes/admin-wallet-users.php`).
 - Preserve backward compatibility for option/meta keys (notably buckets option fallback and existing order/subscription/event meta keys).
-- Update this doc when adding/changing hooks, meta keys, or balance/bucket semantics.
+- Update this doc when adding/changing hooks, meta keys, or Credit/Fund semantics.
