@@ -230,7 +230,7 @@ function aspen_wallet_render_fluent_booking_event_wallet_settings( $event ) {
 		</p>
 		<?php wp_nonce_field( 'aspen_wallet_save_fluent_booking_event_settings', 'aspen_wallet_fb_nonce' ); ?>
 		<p>
-			<label for="aspen-wallet-allowed-buckets"><?php esc_html_e( 'Allowed Buckets (ordered)', 'aspen-wallet' ); ?></label>
+			<label for="aspen-wallet-allowed-buckets"><?php esc_html_e( 'Allowed Funds (spending order)', 'aspen-wallet' ); ?></label>
 			<select id="aspen-wallet-allowed-buckets" name="aspen_wallet_allowed_buckets[]" multiple="multiple">
 				<?php foreach ( $buckets as $bucket ) : ?>
 					<option value="<?php echo esc_attr( $bucket['slug'] ); ?>" <?php selected( in_array( $bucket['slug'], $settings['allowed_buckets'], true ) ); ?>><?php echo esc_html( $bucket['label'] ); ?></option>
@@ -554,7 +554,7 @@ function aspen_wallet_render_booking_event_rules_page() {
 			<?php wp_nonce_field( 'aspen_wallet_save_booking_event_rules' ); ?>
 			<input type="hidden" name="action" value="aspen_wallet_save_booking_event_rules" />
 			<table class="widefat striped">
-				<thead><tr><th><?php esc_html_e( 'Event', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Enable Credits', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Credit Cost', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Allowed Buckets (comma-separated slugs)', 'aspen-wallet' ); ?></th></tr></thead>
+				<thead><tr><th><?php esc_html_e( 'Event', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Enable Credits', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Credit Cost', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Allowed Funds (comma-separated slugs)', 'aspen-wallet' ); ?></th></tr></thead>
 				<tbody>
 				<?php foreach ( $events as $event ) :
 					$event_id = isset( $event['id'] ) ? (int) $event['id'] : 0;
@@ -576,7 +576,7 @@ function aspen_wallet_render_booking_event_rules_page() {
 				</tbody>
 			</table>
 			<?php submit_button( __( 'Save Booking Event Rules', 'aspen-wallet' ) ); ?>
-			<p class="description"><?php echo esc_html( sprintf( __( 'Available bucket slugs: %s', 'aspen-wallet' ), implode( ', ', array_map( static function( $bucket ) { return $bucket['slug']; }, $buckets ) ) ) ); ?></p>
+			<p class="description"><?php echo esc_html( sprintf( __( 'Available Fund slugs: %s', 'aspen-wallet' ), implode( ', ', array_map( static function( $bucket ) { return $bucket['slug']; }, $buckets ) ) ) ); ?></p>
 		</form>
 		<?php endif; ?>
 	</div>

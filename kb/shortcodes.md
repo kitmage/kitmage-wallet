@@ -7,10 +7,10 @@ This knowledge base article explains every Aspen Wallet shortcode, all available
 ## Quick reference
 
 ### `[wallet_balance]`
-Display the current user’s balance for a specific wallet bucket.
+Display the current user’s balance for a specific Wallet Fund.
 
 ### `[wallet_if]...[/wallet_if]`
-Conditionally render content based on the current user’s bucket balance.
+Conditionally render content based on the current Credits in a user’s Fund.
 
 ### `[wallet_booking]`
 Render a Fluent Booking shortcode only when the current user can afford the configured wallet cost for the event.
@@ -21,7 +21,7 @@ Render a Fluent Booking shortcode only when the current user can afford the conf
 
 - All Aspen Wallet balances are stored as **integers**.
 - Shortcodes evaluate against the **currently logged-in user**.
-- If a bucket is missing or invalid, most shortcodes return empty output (or fallback output, if provided).
+- If a Fund is missing or invalid, most shortcodes return empty output (or fallback output, if provided).
 - Fallback attributes are sanitized, and nested shortcodes are allowed inside fallback content.
 
 ---
@@ -29,7 +29,7 @@ Render a Fluent Booking shortcode only when the current user can afford the conf
 ## 1) `[wallet_balance]`
 
 ### Purpose
-Use this shortcode anywhere you want to show a user how many credits they currently have in a bucket.
+Use this shortcode anywhere you want to show a user how many Credits they currently have in a Fund.
 
 ### Syntax
 
@@ -40,7 +40,7 @@ Use this shortcode anywhere you want to show a user how many credits they curren
 ### Attributes
 
 - `bucket` (required)
-  - The bucket slug to read from (example: `general-credits`, `coaching`, `premium`).
+  - The Fund slug to read from (example: `general-credits`, `coaching`, `premium`). The attribute retains its legacy name for backward compatibility.
   - If empty or invalid, output is blank.
 
 - `divide_by` (optional, default: `1`)
@@ -99,7 +99,7 @@ Conditionally show content based on one or more balance checks.
 ### Attributes
 
 - `bucket` (required)
-  - Bucket slug to evaluate.
+  - Fund slug to evaluate. The attribute retains its legacy name for backward compatibility.
 
 - `min` (optional)
   - Requires user balance to be **greater than or equal to** this value.
@@ -111,7 +111,7 @@ Conditionally show content based on one or more balance checks.
   - Requires user balance to be exactly this value.
 
 - `fallback` (optional)
-  - Content to show when conditions fail (or bucket is invalid).
+  - Content to show when conditions fail (or Fund is invalid).
   - Nested shortcodes inside fallback are supported.
 
 ### Rule logic
@@ -229,7 +229,7 @@ This gives users clear state feedback before they attempt booking.
 
 If shortcode output is blank or unexpected:
 
-1. Confirm the bucket slug exists and is spelled correctly.
+1. Confirm the Fund slug exists and is spelled correctly.
 2. Confirm the user is logged in (these shortcodes read current user context).
 3. Confirm attribute values are numeric where required.
 4. Confirm `calendar_id` and `event_id` are valid Fluent Booking IDs.
@@ -239,7 +239,7 @@ If shortcode output is blank or unexpected:
 
 ## Best practices
 
-- Keep bucket slugs stable once used in published content.
+- Keep Fund slugs stable once used in published content.
 - Prefer explicit `fallback` messages for clearer UX.
 - Use `[wallet_if]` around expensive UI blocks to avoid showing inaccessible actions.
 - Use `[wallet_balance]` near booking CTAs to reduce confusion.

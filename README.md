@@ -1,20 +1,20 @@
 # Aspen Wallet
-Aspen Wallet is a WordPress plugin that gives your business a **bucketed credit wallet** for customers. You can grant credits from products, spend credits on bookings, and keep balances organized by credit type (bucket).
+Aspen Wallet is a WordPress plugin that gives each customer a **Wallet organized into Funds**. You can grant Credits from products, spend Credits on bookings, and keep each type of Credit in its own Fund.
 
 ## Who this is for
 
 This plugin is for teams that want to:
-- Sell or grant credits in WooCommerce.
-- Reset or refresh credits on subscription renewals.
-- Let customers spend credits in Fluent Booking.
-- Keep different credit types separate (for example: `general`, `coaching`, `premium`).
+- Sell or grant Credits in WooCommerce.
+- Reset or refresh Credits on subscription renewals.
+- Let customers spend Credits in Fluent Booking.
+- Keep separate Funds (for example: `general`, `coaching`, and `premium`) in a Wallet.
 
 ## What Aspen Wallet does
 
-- **Tracks customer balances by bucket** (integer credits only).
-- **Grants credits from WooCommerce purchases**.
+- **Tracks a customer's Credits in separate Funds** (integer Credits only).
+- **Grants Credits from WooCommerce purchases**.
 - **Supports subscription reset grants** through WooCommerce Subscriptions.
-- **Checks and debits credits for Fluent Booking events**.
+- **Checks and debits Credits for Fluent Booking events**.
 - **Uses a team owner’s wallet for Teams for WooCommerce Memberships members**.
 - **Provides shortcodes** for balance displays and conditional content.
 
@@ -37,36 +37,36 @@ This plugin is for teams that want to:
 
 ## Quick start
 
-1. Go to **Wallet** in WordPress Admin and create your first buckets.
-2. Open WooCommerce products and configure wallet grants (bucket + amount).
+1. Go to **Wallet** in WordPress Admin and create your first Funds.
+2. Open WooCommerce products and configure Wallet grants (Fund + Credits).
 3. (Optional) Set subscription reset grants on subscription products.
-4. Configure wallet rules in Fluent Booking events (enable wallet, set cost, choose allowed buckets).
+4. Configure Wallet rules in Fluent Booking events (enable the Wallet, set the Credit cost, and choose allowed Funds).
 5. Test with a customer account:
-   - Purchase a product that grants credits.
+   - Purchase a product that grants Credits.
    - Verify balance updates.
-   - Attempt a booking that costs credits.
+   - Attempt a booking that costs Credits.
 
 ## Typical customer journey
 
-1. Customer buys a product that grants credits.
-2. Aspen Wallet adds credits to the configured bucket(s).
+1. Customer buys a product that grants Credits.
+2. Aspen Wallet adds Credits to the configured Fund(s).
 3. Customer visits a booking page.
 4. Aspen Wallet checks whether the customer can afford the configured event cost.
    - If the customer is part of a Teams for WooCommerce Memberships team, the team owner's wallet is checked.
-5. If affordable, booking proceeds and credits are debited from the applicable wallet.
+5. If affordable, booking proceeds and Credits are debited from the applicable Funds in the Wallet.
 6. If not affordable, the customer sees your fallback/restriction message.
 
 ## Admin features
 
-- Bucket management (create, edit, and safely delete buckets).
-- User wallet balance management from wp-admin.
-- Profile-level balance editing (with capability checks).
+- Fund management (create, edit, and safely delete Funds).
+- User Wallet and Credit management from wp-admin.
+- Profile-level Credit editing (with capability checks).
 - Booking restriction and debit rules tied to event settings.
 
 ## Shortcodes
 
 - `[wallet_balance bucket="your-bucket"]`
-  - Display the current user’s balance for a bucket.
+  - Display the Credits in a Fund in the current user’s Wallet.
 - `[wallet_if bucket="your-bucket" min="1"]...[/wallet_if]`
   - Render content only when a balance condition passes.
 - `[wallet_booking event_id="123" fallback="Not enough credits."]`
@@ -75,9 +75,10 @@ This plugin is for teams that want to:
 ## Notes for site owners
 
 - Aspen Wallet uses **integer credits** (no decimal balances).
-- Credits are bucket-specific and can be prioritized by allowed buckets in booking rules.
+- Credits are Fund-specific, and allowed Funds can be prioritized in booking rules.
 - For Teams for WooCommerce Memberships users, front-end balance displays, booking affordability checks, and booking debits resolve to the team owner's wallet by default. If a user belongs to multiple teams, Aspen Wallet uses the first team returned by the Teams API unless customized with `aspen_wallet_effective_wallet_user_id`.
 - Some functionality is dependency-gated and only activates when related plugins are active.
+- For backward compatibility, code, stored data, and shortcode attributes may still use the legacy term `bucket`; user-facing interfaces call these Funds.
 
 ## Support and implementation details
 
