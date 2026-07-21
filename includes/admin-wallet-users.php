@@ -26,13 +26,13 @@ function aspen_wallet_render_profile_wallet_section( $user ) {
 
 	$buckets = aspen_wallet_get_buckets();
 	?>
-	<h2><?php echo esc_html__( 'Wallet Balances', 'aspen-wallet' ); ?></h2>
+	<h2><?php echo esc_html__( 'Wallet Funds', 'aspen-wallet' ); ?></h2>
 	<table class="form-table" role="presentation">
 		<tbody>
 			<?php if ( empty( $buckets ) ) : ?>
 				<tr>
 					<th><?php echo esc_html__( 'Wallet', 'aspen-wallet' ); ?></th>
-					<td><em><?php echo esc_html__( 'No buckets configured yet.', 'aspen-wallet' ); ?></em></td>
+					<td><em><?php echo esc_html__( 'No funds configured yet.', 'aspen-wallet' ); ?></em></td>
 				</tr>
 			<?php else : ?>
 				<?php foreach ( $buckets as $bucket ) : ?>
@@ -44,6 +44,7 @@ function aspen_wallet_render_profile_wallet_section( $user ) {
 						<th><label for="wallet_bucket_<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $bucket['label'] ); ?></label></th>
 						<td>
 							<input id="wallet_bucket_<?php echo esc_attr( $slug ); ?>" type="number" name="wallet_bucket[<?php echo esc_attr( $slug ); ?>]" min="0" step="1" value="<?php echo esc_attr( $balance ); ?>" class="regular-text" />
+							<?php echo esc_html__( 'Credits', 'aspen-wallet' ); ?>
 							<p class="description"><code><?php echo esc_html( $slug ); ?></code></p>
 						</td>
 					</tr>
@@ -70,7 +71,7 @@ function aspen_wallet_handle_profile_wallet_save( $user_id ) {
 
 	$nonce = isset( $_POST['aspen_wallet_profile_wallet_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['aspen_wallet_profile_wallet_nonce'] ) ) : '';
 	if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'aspen_wallet_profile_wallet_save' ) ) {
-		aspen_wallet_add_profile_wallet_notice( 'error', __( 'Wallet balances were not saved: invalid wallet profile nonce.', 'aspen-wallet' ) );
+		aspen_wallet_add_profile_wallet_notice( 'error', __( 'Wallet Credits were not saved: invalid wallet profile nonce.', 'aspen-wallet' ) );
 		return;
 	}
 
@@ -105,9 +106,9 @@ function aspen_wallet_handle_profile_wallet_save( $user_id ) {
 	}
 
 	if ( empty( $errors ) ) {
-		aspen_wallet_add_profile_wallet_notice( 'success', __( 'Wallet balances updated.', 'aspen-wallet' ) );
+		aspen_wallet_add_profile_wallet_notice( 'success', __( 'Wallet Credits updated.', 'aspen-wallet' ) );
 	} elseif ( $updated > 0 ) {
-		aspen_wallet_add_profile_wallet_notice( 'success', __( 'Wallet balances partially updated.', 'aspen-wallet' ) );
+		aspen_wallet_add_profile_wallet_notice( 'success', __( 'Wallet Credits partially updated.', 'aspen-wallet' ) );
 	}
 }
 
@@ -173,8 +174,8 @@ function aspen_wallet_register_users_admin_menu() {
 
 	add_submenu_page(
 		'aspen-wallet-users',
-		__( 'User Balances', 'aspen-wallet' ),
-		__( 'User Balances', 'aspen-wallet' ),
+		__( 'User Wallets', 'aspen-wallet' ),
+		__( 'User Wallets', 'aspen-wallet' ),
 		'edit_users',
 		'aspen-wallet-users',
 		'aspen_wallet_render_user_balances_page'
@@ -207,7 +208,7 @@ function aspen_wallet_render_user_balances_page() {
 	}
 	?>
 	<div class="wrap">
-		<h1><?php echo esc_html__( 'Wallet User Balances', 'aspen-wallet' ); ?></h1>
+		<h1><?php echo esc_html__( 'User Wallets', 'aspen-wallet' ); ?></h1>
 
 		<?php foreach ( $errors as $error ) : ?>
 			<div class="notice notice-error"><p><?php echo esc_html( $error ); ?></p></div>
@@ -248,7 +249,7 @@ function aspen_wallet_render_user_balances_page() {
 
 		<?php if ( $selected instanceof WP_User ) : ?>
 			<h2>
-				<?php echo esc_html( sprintf( __( 'Balances for %1$s', 'aspen-wallet' ), $selected->display_name ) ); ?>
+				<?php echo esc_html( sprintf( __( 'Wallet for %1$s', 'aspen-wallet' ), $selected->display_name ) ); ?>
 				<small>&lt;<?php echo esc_html( $selected->user_email ); ?>&gt;</small>
 			</h2>
 
@@ -259,10 +260,10 @@ function aspen_wallet_render_user_balances_page() {
 				<input type="hidden" name="s" value="<?php echo esc_attr( $search_term ); ?>" />
 
 				<table class="widefat striped">
-					<thead><tr><th><?php echo esc_html__( 'Bucket', 'aspen-wallet' ); ?></th><th><?php echo esc_html__( 'Balance (minutes)', 'aspen-wallet' ); ?></th></tr></thead>
+					<thead><tr><th><?php echo esc_html__( 'Fund', 'aspen-wallet' ); ?></th><th><?php echo esc_html__( 'Credits', 'aspen-wallet' ); ?></th></tr></thead>
 					<tbody>
 					<?php if ( empty( $buckets ) ) : ?>
-						<tr><td colspan="2"><?php echo esc_html__( 'No buckets configured yet.', 'aspen-wallet' ); ?></td></tr>
+						<tr><td colspan="2"><?php echo esc_html__( 'No funds configured yet.', 'aspen-wallet' ); ?></td></tr>
 					<?php else : ?>
 						<?php foreach ( $buckets as $bucket ) : ?>
 							<?php
@@ -277,7 +278,7 @@ function aspen_wallet_render_user_balances_page() {
 					<?php endif; ?>
 					</tbody>
 				</table>
-				<?php submit_button( __( 'Save Balances', 'aspen-wallet' ) ); ?>
+				<?php submit_button( __( 'Save Credits', 'aspen-wallet' ) ); ?>
 			</form>
 		<?php elseif ( $user_id > 0 ) : ?>
 			<p><?php echo esc_html__( 'Selected user was not found.', 'aspen-wallet' ); ?></p>
@@ -288,7 +289,7 @@ function aspen_wallet_render_user_balances_page() {
 
 function aspen_wallet_handle_save_user_balances() {
 	if ( ! current_user_can( 'edit_users' ) ) {
-		wp_die( esc_html__( 'You do not have permission to edit user balances.', 'aspen-wallet' ) );
+		wp_die( esc_html__( 'You do not have permission to edit user Wallets.', 'aspen-wallet' ) );
 	}
 
 	check_admin_referer( 'aspen_wallet_save_user_balances' );
@@ -336,7 +337,7 @@ function aspen_wallet_handle_save_user_balances() {
 		array(
 			'user_id'        => $user_id,
 			's'              => isset( $_POST['s'] ) ? sanitize_text_field( wp_unslash( $_POST['s'] ) ) : '',
-			'wallet_success' => rawurlencode( __( 'Balances updated.', 'aspen-wallet' ) ),
+			'wallet_success' => rawurlencode( __( 'Credits updated.', 'aspen-wallet' ) ),
 		)
 	);
 }
