@@ -169,9 +169,9 @@ Failure action payload:
 
 ## Shortcodes & Front-End Behavior (`includes/shortcodes.php`)
 Registered shortcodes (`aspen_wallet_register_shortcode_hooks()`):
-- `[wallet_balance bucket="" divide_by="1" decimals="0" suffix=""]`
-  - Reads the Credits in the effective Wallet user's Fund; returns an escaped string (raw int or formatted). The `bucket` attribute is the legacy public attribute name.
-- `[wallet_if bucket="" min="" max="" equals="" fallback=""]...[/wallet_if]`
+- `[wallet_balance fund="" divide_by="1" decimals="0" suffix=""]`
+  - Reads the Credits in the effective Wallet user's Fund; returns an escaped string (raw int or formatted). The deprecated `bucket` attribute remains an alias for backward compatibility.
+- `[wallet_if fund="" min="" max="" equals="" fallback=""]...[/wallet_if]`
   - Evaluates integer conditions on the effective wallet user's balance; renders enclosed content or fallback.
 - `[wallet_booking calendar_id="0" event_id="0" fallback=""]`
   - Runs wallet affordability check before rendering `[fluent_booking id="{event_id}"]`; filterable via `aspen_wallet_booking_shortcode_output`.

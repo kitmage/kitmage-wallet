@@ -34,13 +34,14 @@ Use this shortcode anywhere you want to show a user how many Credits they curren
 ### Syntax
 
 ```text
-[wallet_balance bucket="" divide_by="1" decimals="0" suffix=""]
+[wallet_balance fund="" divide_by="1" decimals="0" suffix=""]
 ```
 
 ### Attributes
 
-- `bucket` (required)
-  - The Fund slug to read from (example: `general-credits`, `coaching`, `premium`). The attribute retains its legacy name for backward compatibility.
+- `fund` (required)
+  - The Fund slug to read from (example: `general-credits`, `coaching`, `premium`).
+  - The deprecated `bucket` alias remains accepted for backward compatibility.
   - If empty or invalid, output is blank.
 
 - `divide_by` (optional, default: `1`)
@@ -60,20 +61,20 @@ Use this shortcode anywhere you want to show a user how many Credits they curren
 #### Basic
 
 ```text
-[wallet_balance bucket="general-credits"]
+[wallet_balance fund="general-credits"]
 ```
 
 #### Human-friendly units
 If 100 stored credits = 1 hour:
 
 ```text
-[wallet_balance bucket="coaching" divide_by="100" decimals="2" suffix="hours"]
+[wallet_balance fund="coaching" divide_by="100" decimals="2" suffix="hours"]
 ```
 
 #### Whole-number units with label
 
 ```text
-[wallet_balance bucket="sessions" suffix="sessions remaining"]
+[wallet_balance fund="sessions" suffix="sessions remaining"]
 ```
 
 ### When to use
@@ -91,15 +92,16 @@ Conditionally show content based on one or more balance checks.
 ### Syntax
 
 ```text
-[wallet_if bucket="" min="" max="" equals="" fallback=""]
+[wallet_if fund="" min="" max="" equals="" fallback=""]
   ...content shown when conditions match...
 [/wallet_if]
 ```
 
 ### Attributes
 
-- `bucket` (required)
-  - Fund slug to evaluate. The attribute retains its legacy name for backward compatibility.
+- `fund` (required)
+  - Fund slug to evaluate.
+  - The deprecated `bucket` alias remains accepted for backward compatibility.
 
 - `min` (optional)
   - Requires user balance to be **greater than or equal to** this value.
@@ -126,7 +128,7 @@ Conditionally show content based on one or more balance checks.
 #### Show upgrade message when user has no credits
 
 ```text
-[wallet_if bucket="general-credits" equals="0" fallback=""]
+[wallet_if fund="general-credits" equals="0" fallback=""]
 <p>You have no credits left. <a href="/plans">Buy more credits</a>.</p>
 [/wallet_if]
 ```
@@ -134,7 +136,7 @@ Conditionally show content based on one or more balance checks.
 #### Show booking CTA only if balance is sufficient
 
 ```text
-[wallet_if bucket="coaching" min="1" fallback="<p>You need at least 1 coaching credit.</p>"]
+[wallet_if fund="coaching" min="1" fallback="<p>You need at least 1 coaching credit.</p>"]
 <a class="button" href="#book-now">Book a coaching call</a>
 [/wallet_if]
 ```
@@ -142,7 +144,7 @@ Conditionally show content based on one or more balance checks.
 #### Show a tier-specific notice
 
 ```text
-[wallet_if bucket="priority" min="5" max="10" fallback="<p>Priority benefits unlock at 5+ credits.</p>"]
+[wallet_if fund="priority" min="5" max="10" fallback="<p>Priority benefits unlock at 5+ credits.</p>"]
 <p>You are in the Priority access band.</p>
 [/wallet_if]
 ```
@@ -214,9 +216,9 @@ to Fluent Booking.
 ### Pattern: show balance + condition + booking block
 
 ```text
-<p>Your coaching balance: [wallet_balance bucket="coaching" suffix="credits"]</p>
+<p>Your coaching balance: [wallet_balance fund="coaching" suffix="credits"]</p>
 
-[wallet_if bucket="coaching" min="1" fallback="<p>You need at least 1 credit to book this event.</p>"]
+[wallet_if fund="coaching" min="1" fallback="<p>You need at least 1 credit to book this event.</p>"]
   [wallet_booking calendar_id="3" event_id="17" fallback="<p>Booking is currently unavailable for your wallet balance.</p>"]
 [/wallet_if]
 ```

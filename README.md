@@ -65,9 +65,9 @@ This plugin is for teams that want to:
 
 ## Shortcodes
 
-- `[wallet_balance bucket="your-bucket"]`
+- `[wallet_balance fund="your-fund"]`
   - Display the Credits in a Fund in the current user’s Wallet.
-- `[wallet_if bucket="your-bucket" min="1"]...[/wallet_if]`
+- `[wallet_if fund="your-fund" min="1"]...[/wallet_if]`
   - Render content only when a balance condition passes.
 - `[wallet_booking event_id="123" fallback="Not enough credits."]`
   - Show booking output only when the user can afford it.
@@ -78,7 +78,7 @@ This plugin is for teams that want to:
 - Credits are Fund-specific, and allowed Funds can be prioritized in booking rules.
 - For Teams for WooCommerce Memberships users, front-end balance displays, booking affordability checks, and booking debits resolve to the team owner's wallet by default. If a user belongs to multiple teams, Aspen Wallet uses the first team returned by the Teams API unless customized with `aspen_wallet_effective_wallet_user_id`.
 - Some functionality is dependency-gated and only activates when related plugins are active.
-- For backward compatibility, code, stored data, and shortcode attributes may still use the legacy term `bucket`; user-facing interfaces call these Funds.
+- For backward compatibility, code and stored data may still use the legacy term `bucket`. Shortcodes use `fund`; the deprecated `bucket` attribute remains accepted so existing content continues to work.
 
 ## Support and implementation details
 
