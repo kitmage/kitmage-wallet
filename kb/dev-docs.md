@@ -118,6 +118,7 @@ Grant types + resolution:
 
 Apply timing + idempotency:
 - One-time grants apply on `woocommerce_order_status_completed` and `woocommerce_payment_complete`.
+- Each one-time grant amount is multiplied by its order line-item quantity before being added to the wallet.
 - `aspen_wallet_woo_apply_order_one_time_grants()` exits early if order meta `_aspen_wallet_one_time_grants_applied` is `yes`.
 - After processing, stores applied marker/details and adds order note.
 

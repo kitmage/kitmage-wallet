@@ -176,6 +176,11 @@ function aspen_wallet_woo_apply_order_one_time_grants( $order_id ) {
 			continue;
 		}
 
+		$quantity = absint( $item->get_quantity() );
+		if ( $quantity <= 0 ) {
+			continue;
+		}
+
 		foreach ( $grants as $grant ) {
 			$bucket = isset( $grant['bucket'] ) ? aspen_wallet_sanitize_bucket_slug( $grant['bucket'] ) : '';
 			$amount = isset( $grant['amount'] ) ? absint( $grant['amount'] ) : 0;
@@ -184,6 +189,8 @@ function aspen_wallet_woo_apply_order_one_time_grants( $order_id ) {
 			if ( 'one_time_grant' !== $type || '' === $bucket || $amount <= 0 ) {
 				continue;
 			}
+
+			$amount *= $quantity;
 
 			if ( wallet_add_balance( $user_id, $bucket, $amount ) ) {
 				$applied[] = array(
