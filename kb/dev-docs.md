@@ -134,8 +134,9 @@ Processed renewal tracking:
 - Max history retained: 30 order IDs.
 
 Reset grants aggregation + apply timing:
-- Aggregation by Fund in `aspen_wallet_get_subscription_reset_grants()` (last matching line item per Fund wins).
-- Applied during renewal-success handler by `wallet_set_balance( $user_id, $bucket, $amount )`.
+- Aggregation by Fund in `aspen_wallet_get_subscription_reset_grants()` sums each grant multiplied by its line-item quantity.
+- `aspen_wallet_get_user_active_subscription_reset_grants()` sums those entitlements across all active subscriptions owned by the user.
+- Renewal and terminal-status handlers set affected Fund balances to the user's combined active entitlement, so cancelling one subscription preserves grants from the others.
 
 Sequence:
 1. Renewal event fires.

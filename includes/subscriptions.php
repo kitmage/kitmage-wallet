@@ -45,6 +45,8 @@ function aspen_wallet_handle_subscription_renewal_success( $subscription, $last_
 		return;
 	}
 
+	$grants = aspen_wallet_get_user_active_subscription_reset_grants( $user_id );
+
 	foreach ( $grants as $bucket => $amount ) {
 		wallet_set_balance( $user_id, $bucket, $amount );
 	}
@@ -88,8 +90,11 @@ function aspen_wallet_handle_subscription_status( $subscription, $new_status, $o
 		return;
 	}
 
+	$active_grants = aspen_wallet_get_user_active_subscription_reset_grants( $user_id );
+
 	foreach ( array_keys( $grants ) as $bucket ) {
-		wallet_set_balance( $user_id, $bucket, 0 );
+		$amount = isset( $active_grants[ $bucket ] ) ? $active_grants[ $bucket ] : 0;
+		wallet_set_balance( $user_id, $bucket, $amount );
 	}
 
 	$subscription->update_meta_data( ASPEN_WALLET_SUBSCRIPTION_LAST_CLEARED_STATUS_META_KEY, $new_status );
@@ -114,6 +119,7 @@ function aspen_wallet_get_subscription_reset_grants( $subscription ) {
 	$grants_by_bucket = array();
 
 	foreach ( $subscription->get_items( 'line_item' ) as $item ) {
+		$quantity    = absint( $item->get_quantity() );
 		$item_grants = aspen_wallet_woo_get_resolved_item_grants( $item );
 		if ( empty( $item_grants ) ) {
 			continue;
@@ -128,7 +134,45 @@ function aspen_wallet_get_subscription_reset_grants( $subscription ) {
 				continue;
 			}
 
-			$grants_by_bucket[ $bucket ] = $amount;
+			if ( ! isset( $grants_by_bucket[ $bucket ] ) ) {
+				$grants_by_bucket[ $bucket ] = 0;
+			}
+
+			$grants_by_bucket[ $bucket ] += $amount * $quantity;
+		}
+	}
+
+	return $grants_by_bucket;
+}
+
+/**
+ * Get the combined reset entitlement from all of a user's active subscriptions.
+ *
+ * Each subscription and each line item represents an independently purchased
+ * entitlement, so grants for the same Fund are additive.
+ *
+ * @param int $user_id WordPress user ID.
+ * @return array<string, int>
+ */
+function aspen_wallet_get_user_active_subscription_reset_grants( $user_id ) {
+	$grants_by_bucket = array();
+	$user_id          = absint( $user_id );
+
+	if ( $user_id <= 0 || ! function_exists( 'wcs_get_users_subscriptions' ) ) {
+		return $grants_by_bucket;
+	}
+
+	foreach ( wcs_get_users_subscriptions( $user_id ) as $subscription ) {
+		if ( ! $subscription instanceof WC_Subscription || ! $subscription->has_status( 'active' ) ) {
+			continue;
+		}
+
+		foreach ( aspen_wallet_get_subscription_reset_grants( $subscription ) as $bucket => $amount ) {
+			if ( ! isset( $grants_by_bucket[ $bucket ] ) ) {
+				$grants_by_bucket[ $bucket ] = 0;
+			}
+
+			$grants_by_bucket[ $bucket ] += $amount;
 		}
 	}
 
