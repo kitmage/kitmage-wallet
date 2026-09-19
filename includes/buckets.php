@@ -7,10 +7,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const ASPEN_WALLET_BUCKETS_OPTION_KEY = 'aspen_wallet_buckets';
+const KITMAGE_WALLET_BUCKETS_OPTION_KEY = 'kitmage_wallet_buckets';
 
-function aspen_wallet_get_buckets() {
-	$buckets = get_option( ASPEN_WALLET_BUCKETS_OPTION_KEY, null );
+function kitmage_wallet_get_buckets() {
+	$buckets = get_option( KITMAGE_WALLET_BUCKETS_OPTION_KEY, null );
 	if ( null === $buckets ) {
 		$buckets = get_option( 'wallet_buckets', array() );
 	}
@@ -24,7 +24,7 @@ function aspen_wallet_get_buckets() {
 			continue;
 		}
 
-		$slug = isset( $bucket['slug'] ) ? aspen_wallet_sanitize_bucket_slug( $bucket['slug'] ) : '';
+		$slug = isset( $bucket['slug'] ) ? kitmage_wallet_sanitize_bucket_slug( $bucket['slug'] ) : '';
 		if ( '' === $slug ) {
 			continue;
 		}
@@ -39,13 +39,13 @@ function aspen_wallet_get_buckets() {
 	return $clean;
 }
 
-function aspen_wallet_get_bucket_by_slug( $slug ) {
-	$slug = aspen_wallet_sanitize_bucket_slug( $slug );
+function kitmage_wallet_get_bucket_by_slug( $slug ) {
+	$slug = kitmage_wallet_sanitize_bucket_slug( $slug );
 	if ( '' === $slug ) {
 		return null;
 	}
 
-	foreach ( aspen_wallet_get_buckets() as $bucket ) {
+	foreach ( kitmage_wallet_get_buckets() as $bucket ) {
 		if ( $slug === $bucket['slug'] ) {
 			return $bucket;
 		}
@@ -54,27 +54,27 @@ function aspen_wallet_get_bucket_by_slug( $slug ) {
 	return null;
 }
 
-function aspen_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
+function kitmage_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
 	$bucket = is_array( $bucket ) ? $bucket : array();
 
 	$label       = isset( $bucket['label'] ) ? sanitize_text_field( $bucket['label'] ) : '';
 	$description = isset( $bucket['description'] ) ? sanitize_textarea_field( $bucket['description'] ) : '';
-	$slug        = isset( $bucket['slug'] ) ? aspen_wallet_sanitize_bucket_slug( $bucket['slug'] ) : '';
-	$original_slug = aspen_wallet_sanitize_bucket_slug( $original_slug );
+	$slug        = isset( $bucket['slug'] ) ? kitmage_wallet_sanitize_bucket_slug( $bucket['slug'] ) : '';
+	$original_slug = kitmage_wallet_sanitize_bucket_slug( $original_slug );
 
 	if ( '' === $slug ) {
-		return new WP_Error( 'invalid_slug', __( 'Fund slug is required.', 'aspen-wallet' ) );
+		return new WP_Error( 'invalid_slug', __( 'Fund slug is required.', 'kitmage-wallet' ) );
 	}
 
 	if ( ! preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug ) ) {
-		return new WP_Error( 'invalid_slug_format', __( 'Fund slug must be lowercase kebab-case (letters, numbers, and hyphens only).', 'aspen-wallet' ) );
+		return new WP_Error( 'invalid_slug_format', __( 'Fund slug must be lowercase kebab-case (letters, numbers, and hyphens only).', 'kitmage-wallet' ) );
 	}
 
 	if ( '' === $label ) {
 		$label = $slug;
 	}
 
-	$buckets    = aspen_wallet_get_buckets();
+	$buckets    = kitmage_wallet_get_buckets();
 	$next       = array();
 	$did_update = false;
 
@@ -90,7 +90,7 @@ function aspen_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
 		}
 
 		if ( $existing['slug'] === $slug && $existing['slug'] !== $original_slug ) {
-			return new WP_Error( 'duplicate_slug', __( 'Fund slug already exists.', 'aspen-wallet' ) );
+			return new WP_Error( 'duplicate_slug', __( 'Fund slug already exists.', 'kitmage-wallet' ) );
 		}
 
 		$next[] = $existing;
@@ -104,22 +104,22 @@ function aspen_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
 		);
 	}
 
-	update_option( ASPEN_WALLET_BUCKETS_OPTION_KEY, array_values( $next ), false );
+	update_option( KITMAGE_WALLET_BUCKETS_OPTION_KEY, array_values( $next ), false );
 	return true;
 }
 
-function aspen_wallet_delete_bucket( $slug ) {
-	$slug = aspen_wallet_sanitize_bucket_slug( $slug );
+function kitmage_wallet_delete_bucket( $slug ) {
+	$slug = kitmage_wallet_sanitize_bucket_slug( $slug );
 	if ( '' === $slug ) {
-		return new WP_Error( 'invalid_slug', __( 'Fund slug is required.', 'aspen-wallet' ) );
+		return new WP_Error( 'invalid_slug', __( 'Fund slug is required.', 'kitmage-wallet' ) );
 	}
 
-	$references = aspen_wallet_get_bucket_references( $slug );
+	$references = kitmage_wallet_get_bucket_references( $slug );
 	if ( ! empty( $references['product_grants'] ) || ! empty( $references['event_rules'] ) ) {
-		return new WP_Error( 'bucket_in_use', __( 'Fund is referenced by wallet product grants or booking event rules.', 'aspen-wallet' ) );
+		return new WP_Error( 'bucket_in_use', __( 'Fund is referenced by wallet product grants or booking event rules.', 'kitmage-wallet' ) );
 	}
 
-	$buckets = aspen_wallet_get_buckets();
+	$buckets = kitmage_wallet_get_buckets();
 	$next    = array();
 	$found   = false;
 
@@ -132,17 +132,17 @@ function aspen_wallet_delete_bucket( $slug ) {
 	}
 
 	if ( ! $found ) {
-		return new WP_Error( 'not_found', __( 'Fund not found.', 'aspen-wallet' ) );
+		return new WP_Error( 'not_found', __( 'Fund not found.', 'kitmage-wallet' ) );
 	}
 
-	update_option( ASPEN_WALLET_BUCKETS_OPTION_KEY, array_values( $next ), false );
+	update_option( KITMAGE_WALLET_BUCKETS_OPTION_KEY, array_values( $next ), false );
 	return true;
 }
 
-function aspen_wallet_get_bucket_references( $slug ) {
+function kitmage_wallet_get_bucket_references( $slug ) {
 	global $wpdb;
 
-	$slug = aspen_wallet_sanitize_bucket_slug( $slug );
+	$slug = kitmage_wallet_sanitize_bucket_slug( $slug );
 	if ( '' === $slug ) {
 		return array();
 	}
@@ -155,7 +155,7 @@ function aspen_wallet_get_bucket_references( $slug ) {
 	$product_rows = $wpdb->get_results(
 		$wpdb->prepare(
 			"SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s",
-			ASPEN_WALLET_PRODUCT_GRANTS_META_KEY
+			KITMAGE_WALLET_PRODUCT_GRANTS_META_KEY
 		),
 		ARRAY_A
 	);
@@ -167,10 +167,10 @@ function aspen_wallet_get_bucket_references( $slug ) {
 		}
 
 		$grants = maybe_unserialize( $row['meta_value'] );
-		$grants = aspen_wallet_woo_normalize_grants( $grants );
+		$grants = kitmage_wallet_woo_normalize_grants( $grants );
 
 		foreach ( $grants as $grant ) {
-			$grant_bucket = isset( $grant['bucket'] ) ? aspen_wallet_sanitize_bucket_slug( $grant['bucket'] ) : '';
+			$grant_bucket = isset( $grant['bucket'] ) ? kitmage_wallet_sanitize_bucket_slug( $grant['bucket'] ) : '';
 			if ( $grant_bucket === $slug ) {
 				$references['product_grants'][] = $post_id;
 				break;
@@ -181,7 +181,7 @@ function aspen_wallet_get_bucket_references( $slug ) {
 	$event_rows = $wpdb->get_results(
 		$wpdb->prepare(
 			"SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s",
-			ASPEN_WALLET_FB_META_ALLOWED_BUCKETS
+			KITMAGE_WALLET_FB_META_ALLOWED_BUCKETS
 		),
 		ARRAY_A
 	);
@@ -193,7 +193,7 @@ function aspen_wallet_get_bucket_references( $slug ) {
 		}
 
 		$allowed_buckets = maybe_unserialize( $row['meta_value'] );
-		$allowed_buckets = aspen_wallet_normalize_bucket_list( is_array( $allowed_buckets ) ? $allowed_buckets : explode( ',', (string) $allowed_buckets ) );
+		$allowed_buckets = kitmage_wallet_normalize_bucket_list( is_array( $allowed_buckets ) ? $allowed_buckets : explode( ',', (string) $allowed_buckets ) );
 
 		if ( in_array( $slug, $allowed_buckets, true ) ) {
 			$references['event_rules'][] = $post_id;

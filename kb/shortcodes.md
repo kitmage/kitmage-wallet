@@ -1,6 +1,6 @@
-# Aspen Wallet Shortcodes Guide
+# KitMage Wallet Shortcodes Guide
 
-This knowledge base article explains every Aspen Wallet shortcode, all available attributes, and practical usage patterns.
+This knowledge base article explains every KitMage Wallet shortcode, all available attributes, and practical usage patterns.
 
 ---
 
@@ -19,7 +19,7 @@ Render a Fluent Booking shortcode only when the current user can afford the conf
 
 ## Important behavior to understand first
 
-- All Aspen Wallet balances are stored as **integers**.
+- All KitMage Wallet balances are stored as **integers**.
 - Shortcodes evaluate against the **currently logged-in user**.
 - If a Fund is missing or invalid, most shortcodes return empty output (or fallback output, if provided).
 - Fallback attributes are sanitized, and nested shortcodes are allowed inside fallback content.
@@ -179,7 +179,7 @@ Safely embed booking UI that is automatically hidden/replaced when the user cann
 
 - `fallback` (optional)
   - Content to render when booking is blocked by wallet rules.
-  - If omitted, Aspen Wallet may use a system-generated reason message.
+  - If omitted, KitMage Wallet may use a system-generated reason message.
 
 ### How it works
 
@@ -195,7 +195,7 @@ Safely embed booking UI that is automatically hidden/replaced when the user cann
 ```
 
 Fluent Booking identifies the event with its `id` attribute. The `calendar_id`
-attribute on `[wallet_booking]` is validated by Aspen Wallet but is not forwarded
+attribute on `[wallet_booking]` is validated by KitMage Wallet but is not forwarded
 to Fluent Booking.
 
 ### Example usage

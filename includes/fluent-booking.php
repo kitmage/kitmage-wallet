@@ -3,18 +3,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const ASPEN_WALLET_FB_META_ENABLED         = '_aspen_wallet_enabled';
-const ASPEN_WALLET_FB_META_COST            = '_aspen_wallet_credit_cost';
-const ASPEN_WALLET_FB_META_ALLOWED_BUCKETS = '_aspen_wallet_allowed_buckets';
-const ASPEN_WALLET_FB_META_USE_CREDITS_PAYMENT_SETTINGS = '_aspen_wallet_use_credits_in_payment_settings';
+const KITMAGE_WALLET_FB_META_ENABLED         = '_kitmage_wallet_enabled';
+const KITMAGE_WALLET_FB_META_COST            = '_kitmage_wallet_credit_cost';
+const KITMAGE_WALLET_FB_META_ALLOWED_BUCKETS = '_kitmage_wallet_allowed_buckets';
+const KITMAGE_WALLET_FB_META_USE_CREDITS_PAYMENT_SETTINGS = '_kitmage_wallet_use_credits_in_payment_settings';
 
 
-function aspen_wallet_fb_debug_log( $message, $context = array() ) {
-	if ( ! defined( 'WP_DEBUG_LOG' ) || ! WP_DEBUG_LOG || ! defined( 'ASPEN_WALLET_DEBUG' ) || ! ASPEN_WALLET_DEBUG ) {
+function kitmage_wallet_fb_debug_log( $message, $context = array() ) {
+	if ( ! defined( 'WP_DEBUG_LOG' ) || ! WP_DEBUG_LOG || ! defined( 'KITMAGE_WALLET_DEBUG' ) || ! KITMAGE_WALLET_DEBUG ) {
 		return;
 	}
 
-	$line = '[ASPEN_WALLET_FB] ' . $message;
+	$line = '[KITMAGE_WALLET_FB] ' . $message;
 	if ( ! empty( $context ) ) {
 		$encoded = wp_json_encode( $context );
 		if ( false !== $encoded ) {
@@ -25,7 +25,7 @@ function aspen_wallet_fb_debug_log( $message, $context = array() ) {
 	error_log( $line ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 }
 
-function aspen_wallet_fb_to_array( $value ) {
+function kitmage_wallet_fb_to_array( $value ) {
 	if ( is_array( $value ) ) {
 		return $value;
 	}
@@ -37,11 +37,11 @@ function aspen_wallet_fb_to_array( $value ) {
 	return array();
 }
 
-function aspen_wallet_register_fluent_booking_hooks() {
+function kitmage_wallet_register_fluent_booking_hooks() {
 	$fluent_booking_loaded = defined( 'FLUENT_BOOKING' ) || defined( 'FLUENT_BOOKING_VERSION' ) || defined( 'FLUENT_BOOKING_LITE' ) || class_exists( '\\FluentBooking\\App\\App' );
 
 	if ( ! $fluent_booking_loaded ) {
-		aspen_wallet_fb_debug_log( 'Hook registration skipped because Fluent Booking was not detected.', array(
+		kitmage_wallet_fb_debug_log( 'Hook registration skipped because Fluent Booking was not detected.', array(
 			'FLUENT_BOOKING'         => defined( 'FLUENT_BOOKING' ),
 			'FLUENT_BOOKING_VERSION' => defined( 'FLUENT_BOOKING_VERSION' ),
 			'FLUENT_BOOKING_LITE'    => defined( 'FLUENT_BOOKING_LITE' ),
@@ -50,33 +50,33 @@ function aspen_wallet_register_fluent_booking_hooks() {
 		return;
 	}
 
-	add_action( 'fluent_booking_after_event_settings_fields', 'aspen_wallet_render_fluent_booking_event_wallet_settings', 20, 1 );
-	add_action( 'fluent_booking_save_event_settings', 'aspen_wallet_save_fluent_booking_event_wallet_settings', 20, 2 );
+	add_action( 'fluent_booking_after_event_settings_fields', 'kitmage_wallet_render_fluent_booking_event_wallet_settings', 20, 1 );
+	add_action( 'fluent_booking_save_event_settings', 'kitmage_wallet_save_fluent_booking_event_wallet_settings', 20, 2 );
 
-	add_filter( 'fluent_booking/event_payment_settings_defaults', 'aspen_wallet_add_payment_settings_defaults', 20, 2 );
-	add_filter( 'fluent_booking/get_event_payment_settings', 'aspen_wallet_add_payment_settings_fields', 20, 2 );
-	add_filter( 'fluent_booking/payment/get_payment_settings', 'aspen_wallet_add_payment_settings_panel_checkbox', 20, 2 );
-	add_filter( 'fluent_booking/payment/payment_settings_before_update_native', 'aspen_wallet_save_payment_settings_panel_checkbox', 20, 1 );
-	add_filter( 'fluent_booking/payment/payment_settings_before_update_woo', 'aspen_wallet_save_payment_settings_panel_checkbox', 20, 1 );
+	add_filter( 'fluent_booking/event_payment_settings_defaults', 'kitmage_wallet_add_payment_settings_defaults', 20, 2 );
+	add_filter( 'fluent_booking/get_event_payment_settings', 'kitmage_wallet_add_payment_settings_fields', 20, 2 );
+	add_filter( 'fluent_booking/payment/get_payment_settings', 'kitmage_wallet_add_payment_settings_panel_checkbox', 20, 2 );
+	add_filter( 'fluent_booking/payment/payment_settings_before_update_native', 'kitmage_wallet_save_payment_settings_panel_checkbox', 20, 1 );
+	add_filter( 'fluent_booking/payment/payment_settings_before_update_woo', 'kitmage_wallet_save_payment_settings_panel_checkbox', 20, 1 );
 
-	add_filter( 'fluent_booking_event_calendar_html', 'aspen_wallet_filter_fluent_booking_calendar_html', 20, 3 );
-	add_filter( 'aspen_wallet_booking_shortcode_output', 'aspen_wallet_maybe_block_booking_shortcode_output', 20, 4 );
+	add_filter( 'fluent_booking_event_calendar_html', 'kitmage_wallet_filter_fluent_booking_calendar_html', 20, 3 );
+	add_filter( 'kitmage_wallet_booking_shortcode_output', 'kitmage_wallet_maybe_block_booking_shortcode_output', 20, 4 );
 
-	add_filter( 'fluent_booking/booking_data', 'aspen_wallet_validate_fluent_booking_booking_data', 20, 4 );
-	add_action( 'fluent_booking/after_booking_scheduled', 'aspen_wallet_debit_after_fluent_booking_created', 20, 3 );
-	add_action( 'fluent_booking/after_booking_pending', 'aspen_wallet_debit_after_fluent_booking_created', 20, 3 );
+	add_filter( 'fluent_booking/booking_data', 'kitmage_wallet_validate_fluent_booking_booking_data', 20, 4 );
+	add_action( 'fluent_booking/after_booking_scheduled', 'kitmage_wallet_debit_after_fluent_booking_created', 20, 3 );
+	add_action( 'fluent_booking/after_booking_pending', 'kitmage_wallet_debit_after_fluent_booking_created', 20, 3 );
 
-	aspen_wallet_fb_debug_log( 'Registered Fluent Booking wallet hooks.', array(
+	kitmage_wallet_fb_debug_log( 'Registered Fluent Booking wallet hooks.', array(
 		'validation_hook' => 'fluent_booking/booking_data',
 		'debit_hooks'     => array( 'fluent_booking/after_booking_scheduled', 'fluent_booking/after_booking_pending' ),
 	) );
 }
 
 
-function aspen_wallet_get_bucket_registry_slugs() {
+function kitmage_wallet_get_bucket_registry_slugs() {
 	$slugs = array();
 
-	foreach ( aspen_wallet_get_buckets() as $bucket ) {
+	foreach ( kitmage_wallet_get_buckets() as $bucket ) {
 		if ( ! empty( $bucket['slug'] ) ) {
 			$slugs[] = $bucket['slug'];
 		}
@@ -85,13 +85,13 @@ function aspen_wallet_get_bucket_registry_slugs() {
 	return array_values( array_unique( $slugs ) );
 }
 
-function aspen_wallet_sanitize_allowed_buckets( $raw_buckets ) {
+function kitmage_wallet_sanitize_allowed_buckets( $raw_buckets ) {
 	if ( is_string( $raw_buckets ) ) {
 		$raw_buckets = explode( ',', $raw_buckets );
 	}
 
-	$buckets        = aspen_wallet_normalize_bucket_list( $raw_buckets );
-	$registry_slugs = aspen_wallet_get_bucket_registry_slugs();
+	$buckets        = kitmage_wallet_normalize_bucket_list( $raw_buckets );
+	$registry_slugs = kitmage_wallet_get_bucket_registry_slugs();
 
 	if ( empty( $registry_slugs ) ) {
 		return array();
@@ -102,7 +102,7 @@ function aspen_wallet_sanitize_allowed_buckets( $raw_buckets ) {
 	} ) );
 }
 
-function aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id ) {
+function kitmage_wallet_get_fluent_booking_event_wallet_settings( $event_id ) {
 	$event_id = (int) $event_id;
 
 	$settings = array(
@@ -115,7 +115,7 @@ function aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id ) {
 		return $settings;
 	}
 
-	$legacy_enabled = (bool) get_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, true );
+	$legacy_enabled = (bool) get_post_meta( $event_id, KITMAGE_WALLET_FB_META_ENABLED, true );
 	$payment_settings = get_post_meta( $event_id, 'payment_settings', true );
 	$payment_toggle_exists = is_array( $payment_settings ) && array_key_exists( 'enabled', $payment_settings );
 
@@ -124,13 +124,13 @@ function aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id ) {
 	if ( $payment_toggle_exists ) {
 		$settings['enabled'] = in_array( strtolower( (string) $payment_settings['enabled'] ), array( '1', 'true', 'yes', 'on' ), true );
 	} else {
-		// Backward compatibility: older events may only have the legacy Aspen flag, so we fall back until
+		// Backward compatibility: older events may only have the legacy KitMage flag, so we fall back until
 		// the new payment_settings[enabled] value is saved at least once.
 		$settings['enabled'] = $legacy_enabled;
 	}
 
-	$settings['credit_cost'] = aspen_wallet_to_int( get_post_meta( $event_id, ASPEN_WALLET_FB_META_COST, true ) );
-	$settings['allowed_buckets'] = aspen_wallet_sanitize_allowed_buckets( get_post_meta( $event_id, ASPEN_WALLET_FB_META_ALLOWED_BUCKETS, true ) );
+	$settings['credit_cost'] = kitmage_wallet_to_int( get_post_meta( $event_id, KITMAGE_WALLET_FB_META_COST, true ) );
+	$settings['allowed_buckets'] = kitmage_wallet_sanitize_allowed_buckets( get_post_meta( $event_id, KITMAGE_WALLET_FB_META_ALLOWED_BUCKETS, true ) );
 
 	// Hard safety requirements: wallet enforcement is only effective when both a positive cost and
 	// at least one allowed bucket are configured, regardless of which enable toggle was used above.
@@ -143,38 +143,38 @@ function aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id ) {
 
 
 
-function aspen_wallet_add_payment_settings_defaults( $defaults, $calendar_slot ) {
-	$defaults['aspen_wallet_enabled'] = 'no';
+function kitmage_wallet_add_payment_settings_defaults( $defaults, $calendar_slot ) {
+	$defaults['kitmage_wallet_enabled'] = 'no';
 
 	return $defaults;
 }
 
-function aspen_wallet_add_payment_settings_fields( $settings, $calendar_slot ) {
+function kitmage_wallet_add_payment_settings_fields( $settings, $calendar_slot ) {
 	$event_id = is_object( $calendar_slot ) && isset( $calendar_slot->id ) ? (int) $calendar_slot->id : 0;
-	$legacy_enabled = (bool) get_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, true );
-	$settings['aspen_wallet_enabled'] = $legacy_enabled ? 'yes' : ( isset( $settings['aspen_wallet_enabled'] ) ? $settings['aspen_wallet_enabled'] : 'no' );
+	$legacy_enabled = (bool) get_post_meta( $event_id, KITMAGE_WALLET_FB_META_ENABLED, true );
+	$settings['kitmage_wallet_enabled'] = $legacy_enabled ? 'yes' : ( isset( $settings['kitmage_wallet_enabled'] ) ? $settings['kitmage_wallet_enabled'] : 'no' );
 
 	return $settings;
 }
 
-function aspen_wallet_add_payment_settings_panel_checkbox( $data, $calendar_event ) {
+function kitmage_wallet_add_payment_settings_panel_checkbox( $data, $calendar_event ) {
 	$event_id = is_object( $calendar_event ) && isset( $calendar_event->id ) ? (int) $calendar_event->id : 0;
-	$enabled  = (bool) get_post_meta( $event_id, ASPEN_WALLET_FB_META_USE_CREDITS_PAYMENT_SETTINGS, true );
+	$enabled  = (bool) get_post_meta( $event_id, KITMAGE_WALLET_FB_META_USE_CREDITS_PAYMENT_SETTINGS, true );
 
 	if ( ! isset( $data['settings'] ) || ! is_array( $data['settings'] ) ) {
 		$data['settings'] = array();
 	}
 
-	$data['settings']['aspen_wallet_use_credits_in_payment_settings'] = $enabled ? 'yes' : 'no';
-	$data['settings']['aspen_wallet_use_credits_in_payment_settings_label'] = 'Enable Aspen Credits for this event';
-	$data['settings']['aspen_wallet_use_credits_in_payment_settings_nonce'] = wp_create_nonce( 'aspen_wallet_payment_settings_' . $event_id );
+	$data['settings']['kitmage_wallet_use_credits_in_payment_settings'] = $enabled ? 'yes' : 'no';
+	$data['settings']['kitmage_wallet_use_credits_in_payment_settings_label'] = 'Enable KitMage Credits for this event';
+	$data['settings']['kitmage_wallet_use_credits_in_payment_settings_nonce'] = wp_create_nonce( 'kitmage_wallet_payment_settings_' . $event_id );
 
 	return $data;
 }
 
-function aspen_wallet_save_payment_settings_panel_checkbox( $settings ) {
+function kitmage_wallet_save_payment_settings_panel_checkbox( $settings ) {
 	if ( ! current_user_can( 'manage_options' ) ) {
-		aspen_wallet_fb_debug_log( 'Capability check failed for payment-settings save callback.', array( 'capability' => 'manage_options' ) );
+		kitmage_wallet_fb_debug_log( 'Capability check failed for payment-settings save callback.', array( 'capability' => 'manage_options' ) );
 		return $settings;
 	}
 
@@ -183,55 +183,55 @@ function aspen_wallet_save_payment_settings_panel_checkbox( $settings ) {
 		return $settings;
 	}
 
-	$nonce = isset( $settings['aspen_wallet_use_credits_in_payment_settings_nonce'] )
-		? sanitize_text_field( wp_unslash( $settings['aspen_wallet_use_credits_in_payment_settings_nonce'] ) )
+	$nonce = isset( $settings['kitmage_wallet_use_credits_in_payment_settings_nonce'] )
+		? sanitize_text_field( wp_unslash( $settings['kitmage_wallet_use_credits_in_payment_settings_nonce'] ) )
 		: '';
 
-	if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'aspen_wallet_payment_settings_' . $event_id ) ) {
-		aspen_wallet_fb_debug_log( 'Nonce verification failed for payment-settings save callback.', array( 'event_id' => $event_id ) );
+	if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'kitmage_wallet_payment_settings_' . $event_id ) ) {
+		kitmage_wallet_fb_debug_log( 'Nonce verification failed for payment-settings save callback.', array( 'event_id' => $event_id ) );
 		return $settings;
 	}
 
-	$raw_value = isset( $settings['aspen_wallet_use_credits_in_payment_settings'] ) ? $settings['aspen_wallet_use_credits_in_payment_settings'] : 'no';
+	$raw_value = isset( $settings['kitmage_wallet_use_credits_in_payment_settings'] ) ? $settings['kitmage_wallet_use_credits_in_payment_settings'] : 'no';
 	$normalized = ( 'yes' === $raw_value || '1' === (string) $raw_value || 1 === $raw_value ) ? 1 : 0;
 
-	aspen_wallet_fb_debug_log( 'Payment-settings save callback fired with sanitized values.', array(
+	kitmage_wallet_fb_debug_log( 'Payment-settings save callback fired with sanitized values.', array(
 		'event_id'                                            => $event_id,
-		'aspen_wallet_use_credits_in_payment_settings'        => $normalized,
+		'kitmage_wallet_use_credits_in_payment_settings'        => $normalized,
 	) );
 
-	update_post_meta( $event_id, ASPEN_WALLET_FB_META_USE_CREDITS_PAYMENT_SETTINGS, $normalized );
-	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, $normalized );
+	update_post_meta( $event_id, KITMAGE_WALLET_FB_META_USE_CREDITS_PAYMENT_SETTINGS, $normalized );
+	update_post_meta( $event_id, KITMAGE_WALLET_FB_META_ENABLED, $normalized );
 
 	return $settings;
 }
 
 
-function aspen_wallet_render_fluent_booking_event_wallet_settings( $event ) {
+function kitmage_wallet_render_fluent_booking_event_wallet_settings( $event ) {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
 	$event_id  = is_object( $event ) && isset( $event->id ) ? (int) $event->id : (int) $event;
-	$settings  = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
-	$buckets   = aspen_wallet_get_buckets();
+	$settings  = kitmage_wallet_get_fluent_booking_event_wallet_settings( $event_id );
+	$buckets   = kitmage_wallet_get_buckets();
 	?>
-	<div class="aspen-wallet-event-settings">
-		<h3><?php esc_html_e( 'Wallet Restriction', 'aspen-wallet' ); ?></h3>
+	<div class="kitmage-wallet-event-settings">
+		<h3><?php esc_html_e( 'Wallet Restriction', 'kitmage-wallet' ); ?></h3>
 		<p>
 			<label>
-				<input type="checkbox" name="aspen_wallet_enabled" value="1" <?php checked( $settings['enabled'] ); ?> />
-				<?php esc_html_e( 'Enable Aspen Credits for this event', 'aspen-wallet' ); ?>
+				<input type="checkbox" name="kitmage_wallet_enabled" value="1" <?php checked( $settings['enabled'] ); ?> />
+				<?php esc_html_e( 'Enable KitMage Credits for this event', 'kitmage-wallet' ); ?>
 			</label>
 		</p>
 		<p>
-			<label for="aspen-wallet-credit-cost"><?php esc_html_e( 'Credit Cost (int)', 'aspen-wallet' ); ?></label>
-			<input id="aspen-wallet-credit-cost" type="number" min="0" step="1" name="aspen_wallet_credit_cost" value="<?php echo esc_attr( $settings['credit_cost'] ); ?>" />
+			<label for="kitmage-wallet-credit-cost"><?php esc_html_e( 'Credit Cost (int)', 'kitmage-wallet' ); ?></label>
+			<input id="kitmage-wallet-credit-cost" type="number" min="0" step="1" name="kitmage_wallet_credit_cost" value="<?php echo esc_attr( $settings['credit_cost'] ); ?>" />
 		</p>
-		<?php wp_nonce_field( 'aspen_wallet_save_fluent_booking_event_settings', 'aspen_wallet_fb_nonce' ); ?>
+		<?php wp_nonce_field( 'kitmage_wallet_save_fluent_booking_event_settings', 'kitmage_wallet_fb_nonce' ); ?>
 		<p>
-			<label for="aspen-wallet-allowed-buckets"><?php esc_html_e( 'Allowed Funds (spending order)', 'aspen-wallet' ); ?></label>
-			<select id="aspen-wallet-allowed-buckets" name="aspen_wallet_allowed_buckets[]" multiple="multiple">
+			<label for="kitmage-wallet-allowed-buckets"><?php esc_html_e( 'Allowed Funds (spending order)', 'kitmage-wallet' ); ?></label>
+			<select id="kitmage-wallet-allowed-buckets" name="kitmage_wallet_allowed_buckets[]" multiple="multiple">
 				<?php foreach ( $buckets as $bucket ) : ?>
 					<option value="<?php echo esc_attr( $bucket['slug'] ); ?>" <?php selected( in_array( $bucket['slug'], $settings['allowed_buckets'], true ) ); ?>><?php echo esc_html( $bucket['label'] ); ?></option>
 				<?php endforeach; ?>
@@ -241,7 +241,7 @@ function aspen_wallet_render_fluent_booking_event_wallet_settings( $event ) {
 	<?php
 }
 
-function aspen_wallet_save_fluent_booking_event_wallet_settings( $event_id, $payload ) {
+function kitmage_wallet_save_fluent_booking_event_wallet_settings( $event_id, $payload ) {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
@@ -251,26 +251,26 @@ function aspen_wallet_save_fluent_booking_event_wallet_settings( $event_id, $pay
 		return;
 	}
 
-	$nonce = isset( $payload['aspen_wallet_fb_nonce'] ) ? sanitize_text_field( wp_unslash( $payload['aspen_wallet_fb_nonce'] ) ) : '';
-	if ( ! wp_verify_nonce( $nonce, 'aspen_wallet_save_fluent_booking_event_settings' ) ) {
+	$nonce = isset( $payload['kitmage_wallet_fb_nonce'] ) ? sanitize_text_field( wp_unslash( $payload['kitmage_wallet_fb_nonce'] ) ) : '';
+	if ( ! wp_verify_nonce( $nonce, 'kitmage_wallet_save_fluent_booking_event_settings' ) ) {
 		return;
 	}
 
-	$enabled_input = isset( $payload['aspen_wallet_enabled'] ) ? $payload['aspen_wallet_enabled'] : 0;
-	$cost_input    = isset( $payload['aspen_wallet_credit_cost'] ) ? $payload['aspen_wallet_credit_cost'] : 0;
-	$buckets_input = isset( $payload['aspen_wallet_allowed_buckets'] ) ? $payload['aspen_wallet_allowed_buckets'] : array();
+	$enabled_input = isset( $payload['kitmage_wallet_enabled'] ) ? $payload['kitmage_wallet_enabled'] : 0;
+	$cost_input    = isset( $payload['kitmage_wallet_credit_cost'] ) ? $payload['kitmage_wallet_credit_cost'] : 0;
+	$buckets_input = isset( $payload['kitmage_wallet_allowed_buckets'] ) ? $payload['kitmage_wallet_allowed_buckets'] : array();
 
 	$enabled = ! empty( $enabled_input );
-	$cost    = aspen_wallet_to_int( $cost_input );
-	$buckets = aspen_wallet_sanitize_allowed_buckets( $buckets_input );
+	$cost    = kitmage_wallet_to_int( $cost_input );
+	$buckets = kitmage_wallet_sanitize_allowed_buckets( $buckets_input );
 
-	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, $enabled ? 1 : 0 );
-	update_post_meta( $event_id, ASPEN_WALLET_FB_META_COST, $cost );
-	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ALLOWED_BUCKETS, $buckets );
+	update_post_meta( $event_id, KITMAGE_WALLET_FB_META_ENABLED, $enabled ? 1 : 0 );
+	update_post_meta( $event_id, KITMAGE_WALLET_FB_META_COST, $cost );
+	update_post_meta( $event_id, KITMAGE_WALLET_FB_META_ALLOWED_BUCKETS, $buckets );
 }
 
 
-function aspen_wallet_fb_extract_int_field( $value, $keys ) {
+function kitmage_wallet_fb_extract_int_field( $value, $keys ) {
 	if ( ! is_array( $keys ) || empty( $keys ) ) {
 		return 0;
 	}
@@ -289,7 +289,7 @@ function aspen_wallet_fb_extract_int_field( $value, $keys ) {
 }
 
 
-function aspen_wallet_fb_get_booking_payload( $booking ) {
+function kitmage_wallet_fb_get_booking_payload( $booking ) {
 	if ( is_object( $booking ) || is_array( $booking ) ) {
 		return $booking;
 	}
@@ -320,31 +320,31 @@ function aspen_wallet_fb_get_booking_payload( $booking ) {
 	return array();
 }
 
-function aspen_wallet_fb_resolve_booking_event_id( $booking, $event ) {
-	$payload = aspen_wallet_fb_get_booking_payload( $booking );
-	$event_id = aspen_wallet_fb_extract_int_field( $event, array( 'id', 'event_id', 'slot_id', 'calendar_slot_id' ) );
+function kitmage_wallet_fb_resolve_booking_event_id( $booking, $event ) {
+	$payload = kitmage_wallet_fb_get_booking_payload( $booking );
+	$event_id = kitmage_wallet_fb_extract_int_field( $event, array( 'id', 'event_id', 'slot_id', 'calendar_slot_id' ) );
 	if ( $event_id > 0 ) {
 		return $event_id;
 	}
 
-	$event_id = aspen_wallet_fb_extract_int_field( $payload, array( 'event_id', 'slot_id', 'calendar_slot_id', 'calendar_event_id' ) );
-	aspen_wallet_fb_debug_log( 'Resolved booking event id from payload fallback.', array(
+	$event_id = kitmage_wallet_fb_extract_int_field( $payload, array( 'event_id', 'slot_id', 'calendar_slot_id', 'calendar_event_id' ) );
+	kitmage_wallet_fb_debug_log( 'Resolved booking event id from payload fallback.', array(
 		'event_id'       => $event_id,
-		'event_payload'  => aspen_wallet_fb_to_array( $event ),
-		'booking_payload'=> aspen_wallet_fb_to_array( $payload ),
+		'event_payload'  => kitmage_wallet_fb_to_array( $event ),
+		'booking_payload'=> kitmage_wallet_fb_to_array( $payload ),
 	) );
 
 	return $event_id;
 }
 
-function aspen_wallet_fb_resolve_booking_user_id( $booking ) {
-	$payload = aspen_wallet_fb_get_booking_payload( $booking );
-	$user_id = aspen_wallet_fb_extract_int_field( $payload, array( 'user_id', 'wp_user_id', 'attendee_user_id', 'booked_by_user_id' ) );
+function kitmage_wallet_fb_resolve_booking_user_id( $booking ) {
+	$payload = kitmage_wallet_fb_get_booking_payload( $booking );
+	$user_id = kitmage_wallet_fb_extract_int_field( $payload, array( 'user_id', 'wp_user_id', 'attendee_user_id', 'booked_by_user_id' ) );
 	if ( $user_id > 0 ) {
 		return $user_id;
 	}
-	aspen_wallet_fb_debug_log( 'Could not resolve booking user from known user-id fields. Attempting email lookup.', array(
-		'booking_payload' => aspen_wallet_fb_to_array( $payload ),
+	kitmage_wallet_fb_debug_log( 'Could not resolve booking user from known user-id fields. Attempting email lookup.', array(
+		'booking_payload' => kitmage_wallet_fb_to_array( $payload ),
 	) );
 	$email = '';
 	if ( is_object( $payload ) && isset( $payload->email ) ) {
@@ -356,43 +356,43 @@ function aspen_wallet_fb_resolve_booking_user_id( $booking ) {
 	if ( '' !== $email ) {
 		$matched_user = get_user_by( 'email', $email );
 		if ( $matched_user instanceof WP_User ) {
-			aspen_wallet_fb_debug_log( 'Resolved booking user by email fallback.', array( 'email' => $email, 'user_id' => (int) $matched_user->ID ) );
+			kitmage_wallet_fb_debug_log( 'Resolved booking user by email fallback.', array( 'email' => $email, 'user_id' => (int) $matched_user->ID ) );
 			return (int) $matched_user->ID;
 		}
 	}
 
-	aspen_wallet_fb_debug_log( 'Failed to resolve booking user id.', array( 'email' => $email, 'booking_payload' => aspen_wallet_fb_to_array( $payload ) ) );
+	kitmage_wallet_fb_debug_log( 'Failed to resolve booking user id.', array( 'email' => $email, 'booking_payload' => kitmage_wallet_fb_to_array( $payload ) ) );
 
 	return 0;
 }
 
-function aspen_wallet_fluent_booking_affordability( $event_id, $user_id ) {
-	$settings = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
+function kitmage_wallet_fluent_booking_affordability( $event_id, $user_id ) {
+	$settings = kitmage_wallet_get_fluent_booking_event_wallet_settings( $event_id );
 	$user_id  = (int) $user_id;
 
 	if ( ! $settings['enabled'] ) {
-		aspen_wallet_fb_debug_log( 'Affordability check bypassed because wallet rule is disabled.', array( 'event_id' => $event_id, 'user_id' => $user_id, 'settings' => $settings ) );
+		kitmage_wallet_fb_debug_log( 'Affordability check bypassed because wallet rule is disabled.', array( 'event_id' => $event_id, 'user_id' => $user_id, 'settings' => $settings ) );
 		return array( 'allowed' => true, 'reason' => '' );
 	}
 
 	if ( $user_id <= 0 ) {
-		aspen_wallet_fb_debug_log( 'Affordability check failed because no WP user could be determined.', array( 'event_id' => $event_id, 'settings' => $settings ) );
-		return array( 'allowed' => false, 'reason' => __( 'You must be logged in to book this event.', 'aspen-wallet' ) );
+		kitmage_wallet_fb_debug_log( 'Affordability check failed because no WP user could be determined.', array( 'event_id' => $event_id, 'settings' => $settings ) );
+		return array( 'allowed' => false, 'reason' => __( 'You must be logged in to book this event.', 'kitmage-wallet' ) );
 	}
 
-	$wallet_user_id = aspen_wallet_get_effective_wallet_user_id( $user_id );
+	$wallet_user_id = kitmage_wallet_get_effective_wallet_user_id( $user_id );
 
 	if ( $wallet_user_id <= 0 || ! wallet_can_afford( $wallet_user_id, $settings['allowed_buckets'], $settings['credit_cost'] ) ) {
-		aspen_wallet_fb_debug_log( 'Affordability check failed due to insufficient balance.', array( 'event_id' => $event_id, 'booking_user_id' => $user_id, 'wallet_user_id' => $wallet_user_id, 'settings' => $settings ) );
-		return array( 'allowed' => false, 'reason' => __( 'Insufficient wallet credits for this booking.', 'aspen-wallet' ) );
+		kitmage_wallet_fb_debug_log( 'Affordability check failed due to insufficient balance.', array( 'event_id' => $event_id, 'booking_user_id' => $user_id, 'wallet_user_id' => $wallet_user_id, 'settings' => $settings ) );
+		return array( 'allowed' => false, 'reason' => __( 'Insufficient wallet credits for this booking.', 'kitmage-wallet' ) );
 	}
 
 	return array( 'allowed' => true, 'reason' => '', 'wallet_user_id' => $wallet_user_id );
 }
 
-function aspen_wallet_filter_fluent_booking_calendar_html( $html, $event, $context ) {
+function kitmage_wallet_filter_fluent_booking_calendar_html( $html, $event, $context ) {
 	$event_id = is_object( $event ) && isset( $event->id ) ? (int) $event->id : (int) $event;
-	$check    = aspen_wallet_fluent_booking_affordability( $event_id, get_current_user_id() );
+	$check    = kitmage_wallet_fluent_booking_affordability( $event_id, get_current_user_id() );
 
 	if ( $check['allowed'] ) {
 		return $html;
@@ -402,8 +402,8 @@ function aspen_wallet_filter_fluent_booking_calendar_html( $html, $event, $conte
 	return do_shortcode( $fallback );
 }
 
-function aspen_wallet_maybe_block_booking_shortcode_output( $output, $event_id, $fallback, $user_id ) {
-	$check = aspen_wallet_fluent_booking_affordability( $event_id, $user_id );
+function kitmage_wallet_maybe_block_booking_shortcode_output( $output, $event_id, $fallback, $user_id ) {
+	$check = kitmage_wallet_fluent_booking_affordability( $event_id, $user_id );
 	if ( $check['allowed'] ) {
 		return $output;
 	}
@@ -412,9 +412,9 @@ function aspen_wallet_maybe_block_booking_shortcode_output( $output, $event_id, 
 	return do_shortcode( $fallback );
 }
 
-function aspen_wallet_validate_fluent_booking_booking_data( $booking_data, $calendar_slot, $custom_fields_data, $raw_data ) {
-	$event_id = is_object( $calendar_slot ) && isset( $calendar_slot->id ) ? (int) $calendar_slot->id : aspen_wallet_fb_extract_int_field( $booking_data, array( 'event_id' ) );
-	$user_id  = aspen_wallet_fb_extract_int_field( $booking_data, array( 'person_user_id', 'user_id', 'wp_user_id' ) );
+function kitmage_wallet_validate_fluent_booking_booking_data( $booking_data, $calendar_slot, $custom_fields_data, $raw_data ) {
+	$event_id = is_object( $calendar_slot ) && isset( $calendar_slot->id ) ? (int) $calendar_slot->id : kitmage_wallet_fb_extract_int_field( $booking_data, array( 'event_id' ) );
+	$user_id  = kitmage_wallet_fb_extract_int_field( $booking_data, array( 'person_user_id', 'user_id', 'wp_user_id' ) );
 
 	if ( $user_id <= 0 && is_array( $booking_data ) && ! empty( $booking_data['email'] ) ) {
 		$matched_user = get_user_by( 'email', sanitize_email( (string) $booking_data['email'] ) );
@@ -423,8 +423,8 @@ function aspen_wallet_validate_fluent_booking_booking_data( $booking_data, $cale
 		}
 	}
 
-	$check = aspen_wallet_fluent_booking_affordability( $event_id, $user_id );
-	aspen_wallet_fb_debug_log( 'Booking-data wallet validation result.', array(
+	$check = kitmage_wallet_fluent_booking_affordability( $event_id, $user_id );
+	kitmage_wallet_fb_debug_log( 'Booking-data wallet validation result.', array(
 		'event_id'      => $event_id,
 		'user_id'       => $user_id,
 		'allowed'       => ! empty( $check['allowed'] ),
@@ -439,15 +439,15 @@ function aspen_wallet_validate_fluent_booking_booking_data( $booking_data, $cale
 	return new WP_Error( 'wallet_insufficient_credits', $check['reason'] );
 }
 
-function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
-	$event_id = aspen_wallet_fb_resolve_booking_event_id( $booking, $event );
-	$user_id  = aspen_wallet_fb_resolve_booking_user_id( $booking );
+function kitmage_wallet_debit_after_fluent_booking_created( $booking, $event ) {
+	$event_id = kitmage_wallet_fb_resolve_booking_event_id( $booking, $event );
+	$user_id  = kitmage_wallet_fb_resolve_booking_user_id( $booking );
 
-	$payload        = aspen_wallet_fb_get_booking_payload( $booking );
-	$settings       = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
-	$wallet_user_id = $user_id > 0 ? aspen_wallet_get_effective_wallet_user_id( $user_id ) : 0;
+	$payload        = kitmage_wallet_fb_get_booking_payload( $booking );
+	$settings       = kitmage_wallet_get_fluent_booking_event_wallet_settings( $event_id );
+	$wallet_user_id = $user_id > 0 ? kitmage_wallet_get_effective_wallet_user_id( $user_id ) : 0;
 	if ( ! $settings['enabled'] || $user_id <= 0 || $wallet_user_id <= 0 ) {
-		aspen_wallet_fb_debug_log( 'Skipping wallet debit after booking create.', array(
+		kitmage_wallet_fb_debug_log( 'Skipping wallet debit after booking create.', array(
 			'event_id'        => $event_id,
 			'booking_user_id' => $user_id,
 			'wallet_user_id'  => $wallet_user_id,
@@ -457,17 +457,17 @@ function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
 		return;
 	}
 
-	aspen_wallet_fb_debug_log( 'Attempting wallet debit after booking creation.', array(
+	kitmage_wallet_fb_debug_log( 'Attempting wallet debit after booking creation.', array(
 		'event_id'        => $event_id,
 		'booking_user_id' => $user_id,
 		'wallet_user_id'  => $wallet_user_id,
 		'credit_cost'     => $settings['credit_cost'],
 		'allowed_buckets' => $settings['allowed_buckets'],
-		'booking_payload' => aspen_wallet_fb_to_array( $payload ),
+		'booking_payload' => kitmage_wallet_fb_to_array( $payload ),
 	) );
 
 	$debit = wallet_debit_balances( $wallet_user_id, $settings['allowed_buckets'], $settings['credit_cost'] );
-	aspen_wallet_fb_debug_log( 'Wallet debit result after booking creation.', array(
+	kitmage_wallet_fb_debug_log( 'Wallet debit result after booking creation.', array(
 		'event_id'    => $event_id,
 		'booking_user_id' => $user_id,
 		'wallet_user_id'  => $wallet_user_id,
@@ -478,18 +478,18 @@ function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
 	}
 
 	do_action(
-		'aspen_wallet_booking_debit_failed',
+		'kitmage_wallet_booking_debit_failed',
 		array(
-			'booking_id'     => aspen_wallet_fb_extract_int_field( $payload, array( 'id' ) ),
+			'booking_id'     => kitmage_wallet_fb_extract_int_field( $payload, array( 'id' ) ),
 			'event_id'       => $event_id,
 			'user_id'        => $user_id,
 			'wallet_user_id' => $wallet_user_id,
-			'reason'         => __( 'Wallet debit failed after booking creation.', 'aspen-wallet' ),
+			'reason'         => __( 'Wallet debit failed after booking creation.', 'kitmage-wallet' ),
 		)
 	);
 }
 
-function aspen_wallet_get_fluent_booking_events_for_admin() {
+function kitmage_wallet_get_fluent_booking_events_for_admin() {
 	global $wpdb;
 
 	$slot_tables = array(
@@ -531,34 +531,34 @@ function aspen_wallet_get_fluent_booking_events_for_admin() {
 	return is_array( $rows ) ? $rows : array();
 }
 
-function aspen_wallet_render_booking_event_rules_page() {
+function kitmage_wallet_render_booking_event_rules_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'You do not have permission to access this page.', 'aspen-wallet' ) );
+		wp_die( esc_html__( 'You do not have permission to access this page.', 'kitmage-wallet' ) );
 	}
 
-	$events  = aspen_wallet_get_fluent_booking_events_for_admin();
-	$buckets = aspen_wallet_get_buckets();
-	$errors  = aspen_wallet_parse_notice_messages( isset( $_GET['wallet_errors'] ) ? wp_unslash( $_GET['wallet_errors'] ) : '' );
-	$success = aspen_wallet_parse_notice_messages( isset( $_GET['wallet_success'] ) ? wp_unslash( $_GET['wallet_success'] ) : '' );
+	$events  = kitmage_wallet_get_fluent_booking_events_for_admin();
+	$buckets = kitmage_wallet_get_buckets();
+	$errors  = kitmage_wallet_parse_notice_messages( isset( $_GET['wallet_errors'] ) ? wp_unslash( $_GET['wallet_errors'] ) : '' );
+	$success = kitmage_wallet_parse_notice_messages( isset( $_GET['wallet_success'] ) ? wp_unslash( $_GET['wallet_success'] ) : '' );
 	?>
 	<div class="wrap">
-		<h1><?php esc_html_e( 'Booking Event Rules', 'aspen-wallet' ); ?></h1>
-		<p class="description"><?php esc_html_e( 'Associate each Fluent Booking event with Aspen wallet credit rules.', 'aspen-wallet' ); ?></p>
+		<h1><?php esc_html_e( 'Booking Event Rules', 'kitmage-wallet' ); ?></h1>
+		<p class="description"><?php esc_html_e( 'Associate each Fluent Booking event with KitMage wallet credit rules.', 'kitmage-wallet' ); ?></p>
 		<?php foreach ( $errors as $error ) : ?><div class="notice notice-error"><p><?php echo esc_html( $error ); ?></p></div><?php endforeach; ?>
 		<?php foreach ( $success as $message ) : ?><div class="notice notice-success"><p><?php echo esc_html( $message ); ?></p></div><?php endforeach; ?>
 
 		<?php if ( empty( $events ) ) : ?>
-			<p><?php esc_html_e( 'No Fluent Booking events were found. Confirm Fluent Booking is active and events exist.', 'aspen-wallet' ); ?></p>
+			<p><?php esc_html_e( 'No Fluent Booking events were found. Confirm Fluent Booking is active and events exist.', 'kitmage-wallet' ); ?></p>
 		<?php else : ?>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-			<?php wp_nonce_field( 'aspen_wallet_save_booking_event_rules' ); ?>
-			<input type="hidden" name="action" value="aspen_wallet_save_booking_event_rules" />
+			<?php wp_nonce_field( 'kitmage_wallet_save_booking_event_rules' ); ?>
+			<input type="hidden" name="action" value="kitmage_wallet_save_booking_event_rules" />
 			<table class="widefat striped">
-				<thead><tr><th><?php esc_html_e( 'Event', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Enable Credits', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Credit Cost', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Allowed Funds (comma-separated slugs)', 'aspen-wallet' ); ?></th></tr></thead>
+				<thead><tr><th><?php esc_html_e( 'Event', 'kitmage-wallet' ); ?></th><th><?php esc_html_e( 'Enable Credits', 'kitmage-wallet' ); ?></th><th><?php esc_html_e( 'Credit Cost', 'kitmage-wallet' ); ?></th><th><?php esc_html_e( 'Allowed Funds (comma-separated slugs)', 'kitmage-wallet' ); ?></th></tr></thead>
 				<tbody>
 				<?php foreach ( $events as $event ) :
 					$event_id = isset( $event['id'] ) ? (int) $event['id'] : 0;
-					$settings = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
+					$settings = kitmage_wallet_get_fluent_booking_event_wallet_settings( $event_id );
 					$calendar_id = isset( $event['calendar_id'] ) ? (int) $event['calendar_id'] : 0;
 					$link = admin_url( 'admin.php?page=fluent-booking#/calendars/' . $calendar_id . '/slot-settings/' . $event_id . '/event-details' );
 				?>
@@ -566,29 +566,29 @@ function aspen_wallet_render_booking_event_rules_page() {
 					<td>
 						<strong><?php echo esc_html( isset( $event['title'] ) ? $event['title'] : '' ); ?></strong>
 						<div><code><?php echo esc_html( sprintf( 'Event #%d / Calendar #%d', $event_id, $calendar_id ) ); ?></code></div>
-						<div><a href="<?php echo esc_url( $link ); ?>" target="_blank"><?php esc_html_e( 'Open in Fluent Booking', 'aspen-wallet' ); ?></a></div>
+						<div><a href="<?php echo esc_url( $link ); ?>" target="_blank"><?php esc_html_e( 'Open in Fluent Booking', 'kitmage-wallet' ); ?></a></div>
 					</td>
-					<td><label><input type="checkbox" name="rules[<?php echo esc_attr( $event_id ); ?>][enabled]" value="1" <?php checked( $settings['enabled'] ); ?> /> <?php esc_html_e( 'Enabled', 'aspen-wallet' ); ?></label></td>
+					<td><label><input type="checkbox" name="rules[<?php echo esc_attr( $event_id ); ?>][enabled]" value="1" <?php checked( $settings['enabled'] ); ?> /> <?php esc_html_e( 'Enabled', 'kitmage-wallet' ); ?></label></td>
 					<td><input type="number" min="0" step="1" name="rules[<?php echo esc_attr( $event_id ); ?>][credit_cost]" value="<?php echo esc_attr( $settings['credit_cost'] ); ?>" /></td>
 					<td><input type="text" class="regular-text" name="rules[<?php echo esc_attr( $event_id ); ?>][allowed_buckets]" value="<?php echo esc_attr( implode( ',', $settings['allowed_buckets'] ) ); ?>" placeholder="nexus-consulting-prepaid,nexus-consulting-subscription" /></td>
 				</tr>
 				<?php endforeach; ?>
 				</tbody>
 			</table>
-			<?php submit_button( __( 'Save Booking Event Rules', 'aspen-wallet' ) ); ?>
-			<p class="description"><?php echo esc_html( sprintf( __( 'Available Fund slugs: %s', 'aspen-wallet' ), implode( ', ', array_map( static function( $bucket ) { return $bucket['slug']; }, $buckets ) ) ) ); ?></p>
+			<?php submit_button( __( 'Save Booking Event Rules', 'kitmage-wallet' ) ); ?>
+			<p class="description"><?php echo esc_html( sprintf( __( 'Available Fund slugs: %s', 'kitmage-wallet' ), implode( ', ', array_map( static function( $bucket ) { return $bucket['slug']; }, $buckets ) ) ) ); ?></p>
 		</form>
 		<?php endif; ?>
 	</div>
 	<?php
 }
 
-function aspen_wallet_handle_save_booking_event_rules() {
+function kitmage_wallet_handle_save_booking_event_rules() {
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'You do not have permission to save booking event rules.', 'aspen-wallet' ) );
+		wp_die( esc_html__( 'You do not have permission to save booking event rules.', 'kitmage-wallet' ) );
 	}
 
-	check_admin_referer( 'aspen_wallet_save_booking_event_rules' );
+	check_admin_referer( 'kitmage_wallet_save_booking_event_rules' );
 
 	$rules = isset( $_POST['rules'] ) && is_array( $_POST['rules'] ) ? wp_unslash( $_POST['rules'] ) : array();
 	foreach ( $rules as $event_id => $rule ) {
@@ -598,14 +598,14 @@ function aspen_wallet_handle_save_booking_event_rules() {
 		}
 
 		$enabled = ! empty( $rule['enabled'] ) ? 1 : 0;
-		$cost    = aspen_wallet_to_int( isset( $rule['credit_cost'] ) ? $rule['credit_cost'] : 0 );
-		$buckets = aspen_wallet_sanitize_allowed_buckets( isset( $rule['allowed_buckets'] ) ? $rule['allowed_buckets'] : '' );
+		$cost    = kitmage_wallet_to_int( isset( $rule['credit_cost'] ) ? $rule['credit_cost'] : 0 );
+		$buckets = kitmage_wallet_sanitize_allowed_buckets( isset( $rule['allowed_buckets'] ) ? $rule['allowed_buckets'] : '' );
 
-		update_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, $enabled );
-		update_post_meta( $event_id, ASPEN_WALLET_FB_META_COST, $cost );
-		update_post_meta( $event_id, ASPEN_WALLET_FB_META_ALLOWED_BUCKETS, $buckets );
+		update_post_meta( $event_id, KITMAGE_WALLET_FB_META_ENABLED, $enabled );
+		update_post_meta( $event_id, KITMAGE_WALLET_FB_META_COST, $cost );
+		update_post_meta( $event_id, KITMAGE_WALLET_FB_META_ALLOWED_BUCKETS, $buckets );
 	}
 
-	wp_safe_redirect( add_query_arg( array( 'page' => 'aspen-wallet-booking-rules', 'wallet_success' => rawurlencode( __( 'Booking event rules updated.', 'aspen-wallet' ) ) ), admin_url( 'admin.php' ) ) );
+	wp_safe_redirect( add_query_arg( array( 'page' => 'kitmage-wallet-booking-rules', 'wallet_success' => rawurlencode( __( 'Booking event rules updated.', 'kitmage-wallet' ) ) ), admin_url( 'admin.php' ) ) );
 	exit;
 }

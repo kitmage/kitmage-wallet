@@ -1,5 +1,5 @@
-# Aspen Wallet
-Aspen Wallet is a WordPress plugin that gives each customer a **Wallet organized into Funds**. You can grant Credits from products, spend Credits on bookings, and keep each type of Credit in its own Fund.
+# KitMage Wallet
+KitMage Wallet is a WordPress plugin that gives each customer a **Wallet organized into Funds**. You can grant Credits from products, spend Credits on bookings, and keep each type of Credit in its own Fund.
 
 ## Who this is for
 
@@ -9,7 +9,7 @@ This plugin is for teams that want to:
 - Let customers spend Credits in Fluent Booking.
 - Keep separate Funds (for example: `general`, `coaching`, and `premium`) in a Wallet.
 
-## What Aspen Wallet does
+## What KitMage Wallet does
 
 - **Tracks a customer's Credits in separate Funds** (integer Credits only).
 - **Grants Credits from WooCommerce purchases**.
@@ -32,7 +32,7 @@ This plugin is for teams that want to:
 
 1. Upload the plugin folder to your WordPress site’s `wp-content/plugins/` directory.
 2. In WordPress Admin, go to **Plugins**.
-3. Activate **Aspen Wallet**.
+3. Activate **KitMage Wallet**.
 4. Confirm the plugin dependencies you plan to use are also installed and active.
 
 ## Quick start
@@ -49,9 +49,9 @@ This plugin is for teams that want to:
 ## Typical customer journey
 
 1. Customer buys a product that grants Credits.
-2. Aspen Wallet adds Credits to the configured Fund(s).
+2. KitMage Wallet adds Credits to the configured Fund(s).
 3. Customer visits a booking page.
-4. Aspen Wallet checks whether the customer can afford the configured event cost.
+4. KitMage Wallet checks whether the customer can afford the configured event cost.
    - If the customer is part of a Teams for WooCommerce Memberships team, the team owner's wallet is checked.
 5. If affordable, booking proceeds and Credits are debited from the applicable Funds in the Wallet.
 6. If not affordable, the customer sees your fallback/restriction message.
@@ -74,9 +74,9 @@ This plugin is for teams that want to:
 
 ## Notes for site owners
 
-- Aspen Wallet uses **integer credits** (no decimal balances).
+- KitMage Wallet uses **integer credits** (no decimal balances).
 - Credits are Fund-specific, and allowed Funds can be prioritized in booking rules.
-- For Teams for WooCommerce Memberships users, front-end balance displays, booking affordability checks, and booking debits resolve to the team owner's wallet by default. If a user belongs to multiple teams, Aspen Wallet uses the first team returned by the Teams API unless customized with `aspen_wallet_effective_wallet_user_id`.
+- For Teams for WooCommerce Memberships users, front-end balance displays, booking affordability checks, and booking debits resolve to the team owner's wallet by default. If a user belongs to multiple teams, KitMage Wallet uses the first team returned by the Teams API unless customized with `kitmage_wallet_effective_wallet_user_id`.
 - Some functionality is dependency-gated and only activates when related plugins are active.
 - For backward compatibility, code and stored data may still use the legacy term `bucket`. Shortcodes use `fund`; the deprecated `bucket` attribute remains accepted so existing content continues to work.
 
