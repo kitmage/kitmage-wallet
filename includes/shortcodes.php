@@ -3,10 +3,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-function aspen_wallet_register_shortcode_hooks() {
-	add_shortcode( 'wallet_balance', 'aspen_wallet_shortcode_balance' );
-	add_shortcode( 'wallet_if', 'aspen_wallet_shortcode_if' );
-	add_shortcode( 'wallet_booking', 'aspen_wallet_shortcode_booking' );
+function kitmage_wallet_register_shortcode_hooks() {
+	add_shortcode( 'wallet_balance', 'kitmage_wallet_shortcode_balance' );
+	add_shortcode( 'wallet_if', 'kitmage_wallet_shortcode_if' );
+	add_shortcode( 'wallet_booking', 'kitmage_wallet_shortcode_booking' );
 }
 
 /**
@@ -15,7 +15,7 @@ function aspen_wallet_register_shortcode_hooks() {
  * @param mixed $fallback Raw fallback content.
  * @return string
  */
-function aspen_wallet_sanitize_shortcode_fallback( $fallback ) {
+function kitmage_wallet_sanitize_shortcode_fallback( $fallback ) {
 	if ( is_array( $fallback ) || is_object( $fallback ) ) {
 		return '';
 	}
@@ -26,7 +26,7 @@ function aspen_wallet_sanitize_shortcode_fallback( $fallback ) {
 	return trim( $fallback );
 }
 
-function aspen_wallet_shortcode_balance( $atts ) {
+function kitmage_wallet_shortcode_balance( $atts ) {
 	$raw_atts = (array) $atts;
 	$atts = shortcode_atts(
 		array(
@@ -42,17 +42,17 @@ function aspen_wallet_shortcode_balance( $atts ) {
 	);
 
 	$fund_input = '' !== (string) $atts['fund'] ? $atts['fund'] : $atts['bucket'];
-	$fund       = aspen_wallet_sanitize_bucket_slug( $fund_input );
-	if ( '' === $fund || ! aspen_wallet_get_bucket_by_slug( $fund ) ) {
+	$fund       = kitmage_wallet_sanitize_bucket_slug( $fund_input );
+	if ( '' === $fund || ! kitmage_wallet_get_bucket_by_slug( $fund ) ) {
 		return '';
 	}
 
 	$user_id        = get_current_user_id();
-	$wallet_user_id = aspen_wallet_get_effective_wallet_user_id( $user_id );
+	$wallet_user_id = kitmage_wallet_get_effective_wallet_user_id( $user_id );
 	$amount         = wallet_get_balance( $wallet_user_id, $fund );
 
-	$divide_by = aspen_wallet_to_int( $atts['divide_by'] );
-	$decimals  = min( 6, aspen_wallet_to_int( $atts['decimals'] ) );
+	$divide_by = kitmage_wallet_to_int( $atts['divide_by'] );
+	$decimals  = min( 6, kitmage_wallet_to_int( $atts['decimals'] ) );
 
 	if ( $divide_by <= 1 ) {
 		$output = (string) $amount;
@@ -68,7 +68,7 @@ function aspen_wallet_shortcode_balance( $atts ) {
 	return esc_html( $output );
 }
 
-function aspen_wallet_shortcode_if( $atts, $content = '' ) {
+function kitmage_wallet_shortcode_if( $atts, $content = '' ) {
 	$raw_atts = (array) $atts;
 	$atts = shortcode_atts(
 		array(
@@ -85,23 +85,23 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 	);
 
 	$user_id        = get_current_user_id();
-	$wallet_user_id = aspen_wallet_get_effective_wallet_user_id( $user_id );
+	$wallet_user_id = kitmage_wallet_get_effective_wallet_user_id( $user_id );
 
 	$has_rule   = false;
 	$conditions = array();
 
 	if ( null !== $atts['min'] && '' !== $atts['min'] ) {
-		$conditions['min'] = aspen_wallet_to_int( $atts['min'] );
+		$conditions['min'] = kitmage_wallet_to_int( $atts['min'] );
 		$has_rule          = true;
 	}
 
 	if ( null !== $atts['max'] && '' !== $atts['max'] ) {
-		$conditions['max'] = aspen_wallet_to_int( $atts['max'] );
+		$conditions['max'] = kitmage_wallet_to_int( $atts['max'] );
 		$has_rule          = true;
 	}
 
 	if ( null !== $atts['equals'] && '' !== $atts['equals'] ) {
-		$conditions['equals'] = aspen_wallet_to_int( $atts['equals'] );
+		$conditions['equals'] = kitmage_wallet_to_int( $atts['equals'] );
 		$has_rule             = true;
 	}
 
@@ -111,7 +111,7 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 
 	if ( '' === $fund_input ) {
 		$balance = 0;
-		foreach ( aspen_wallet_get_buckets() as $bucket ) {
+		foreach ( kitmage_wallet_get_buckets() as $bucket ) {
 			if ( empty( $bucket['slug'] ) ) {
 				continue;
 			}
@@ -119,16 +119,16 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 		}
 	} else {
 		$raw_buckets = explode( ',', $fund_input );
-		$buckets     = aspen_wallet_normalize_bucket_list( $raw_buckets );
+		$buckets     = kitmage_wallet_normalize_bucket_list( $raw_buckets );
 
 		if ( empty( $buckets ) ) {
-			$fallback = aspen_wallet_sanitize_shortcode_fallback( $atts['fallback'] );
+			$fallback = kitmage_wallet_sanitize_shortcode_fallback( $atts['fallback'] );
 			return '' !== $fallback ? do_shortcode( $fallback ) : '';
 		}
 
 		$balance = 0;
 		foreach ( $buckets as $bucket ) {
-			if ( ! aspen_wallet_get_bucket_by_slug( $bucket ) ) {
+			if ( ! kitmage_wallet_get_bucket_by_slug( $bucket ) ) {
 				continue;
 			}
 			$balance += wallet_get_balance( $wallet_user_id, $bucket );
@@ -157,11 +157,11 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 		return do_shortcode( wp_kses_post( (string) $content ) );
 	}
 
-	$fallback = aspen_wallet_sanitize_shortcode_fallback( $atts['fallback'] );
+	$fallback = kitmage_wallet_sanitize_shortcode_fallback( $atts['fallback'] );
 	return '' !== $fallback ? do_shortcode( $fallback ) : '';
 }
 
-function aspen_wallet_shortcode_booking( $atts ) {
+function kitmage_wallet_shortcode_booking( $atts ) {
 	$atts = shortcode_atts(
 		array(
 			'calendar_id' => 0,
@@ -172,17 +172,17 @@ function aspen_wallet_shortcode_booking( $atts ) {
 		'wallet_booking'
 	);
 
-	$calendar_id = aspen_wallet_to_int( $atts['calendar_id'] );
-	$event_id    = aspen_wallet_to_int( $atts['event_id'] );
-	$fallback    = aspen_wallet_sanitize_shortcode_fallback( $atts['fallback'] );
+	$calendar_id = kitmage_wallet_to_int( $atts['calendar_id'] );
+	$event_id    = kitmage_wallet_to_int( $atts['event_id'] );
+	$fallback    = kitmage_wallet_sanitize_shortcode_fallback( $atts['fallback'] );
 
 	if ( $calendar_id <= 0 || $event_id <= 0 ) {
 		return '';
 	}
 
-	$check = aspen_wallet_fluent_booking_affordability( $event_id, get_current_user_id() );
+	$check = kitmage_wallet_fluent_booking_affordability( $event_id, get_current_user_id() );
 	if ( empty( $check['allowed'] ) ) {
-		$blocked = '' !== $fallback ? $fallback : ( isset( $check['reason'] ) ? aspen_wallet_sanitize_shortcode_fallback( $check['reason'] ) : '' );
+		$blocked = '' !== $fallback ? $fallback : ( isset( $check['reason'] ) ? kitmage_wallet_sanitize_shortcode_fallback( $check['reason'] ) : '' );
 		return '' !== $blocked ? do_shortcode( $blocked ) : '';
 	}
 
@@ -192,5 +192,5 @@ function aspen_wallet_shortcode_booking( $atts ) {
 	);
 	$output = do_shortcode( $booking_shortcode );
 
-	return apply_filters( 'aspen_wallet_booking_shortcode_output', $output, $event_id, $fallback, get_current_user_id() );
+	return apply_filters( 'kitmage_wallet_booking_shortcode_output', $output, $event_id, $fallback, get_current_user_id() );
 }

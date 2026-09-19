@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param mixed $value Raw value.
  * @return int
  */
-function aspen_wallet_to_int( $value ) {
+function kitmage_wallet_to_int( $value ) {
 	if ( is_bool( $value ) || is_array( $value ) || is_object( $value ) ) {
 		return 0;
 	}
@@ -33,9 +33,9 @@ function aspen_wallet_to_int( $value ) {
  * @param bool  $allow_negative Allow negative integers.
  * @return int|WP_Error
  */
-function aspen_wallet_parse_int_amount( $raw, $allow_negative = false ) {
+function kitmage_wallet_parse_int_amount( $raw, $allow_negative = false ) {
 	if ( is_bool( $raw ) || is_array( $raw ) || is_object( $raw ) || null === $raw ) {
-		return new WP_Error( 'invalid_amount', __( 'Amount must be a whole integer.', 'aspen-wallet' ) );
+		return new WP_Error( 'invalid_amount', __( 'Amount must be a whole integer.', 'kitmage-wallet' ) );
 	}
 
 	if ( is_int( $raw ) ) {
@@ -45,14 +45,14 @@ function aspen_wallet_parse_int_amount( $raw, $allow_negative = false ) {
 		$raw = is_string( $raw ) ? trim( sanitize_text_field( $raw ) ) : (string) $raw;
 
 		if ( '' === $raw || ! preg_match( '/^-?\d+$/', $raw ) ) {
-			return new WP_Error( 'invalid_amount', __( 'Amount must be a whole integer.', 'aspen-wallet' ) );
+			return new WP_Error( 'invalid_amount', __( 'Amount must be a whole integer.', 'kitmage-wallet' ) );
 		}
 
 		$value = (int) $raw;
 	}
 
 	if ( ! $allow_negative && $value < 0 ) {
-		return new WP_Error( 'invalid_amount', __( 'Amount cannot be negative.', 'aspen-wallet' ) );
+		return new WP_Error( 'invalid_amount', __( 'Amount cannot be negative.', 'kitmage-wallet' ) );
 	}
 
 	return $value;
@@ -64,7 +64,7 @@ function aspen_wallet_parse_int_amount( $raw, $allow_negative = false ) {
  * @param string $slug Raw slug.
  * @return string
  */
-function aspen_wallet_sanitize_bucket_slug( $slug ) {
+function kitmage_wallet_sanitize_bucket_slug( $slug ) {
 	return sanitize_title( wp_unslash( (string) $slug ) );
 }
 
@@ -74,8 +74,8 @@ function aspen_wallet_sanitize_bucket_slug( $slug ) {
  * @param string $bucket Bucket slug.
  * @return string
  */
-function aspen_wallet_bucket_meta_key( $bucket ) {
-	$bucket = aspen_wallet_sanitize_bucket_slug( $bucket );
+function kitmage_wallet_bucket_meta_key( $bucket ) {
+	$bucket = kitmage_wallet_sanitize_bucket_slug( $bucket );
 	return '_user_wallet_bucket_' . str_replace( '-', '_', $bucket );
 }
 
@@ -85,7 +85,7 @@ function aspen_wallet_bucket_meta_key( $bucket ) {
  * @param mixed $buckets Bucket list.
  * @return string[]
  */
-function aspen_wallet_normalize_bucket_list( $buckets ) {
+function kitmage_wallet_normalize_bucket_list( $buckets ) {
 	if ( ! is_array( $buckets ) ) {
 		$buckets = array();
 	}
@@ -93,7 +93,7 @@ function aspen_wallet_normalize_bucket_list( $buckets ) {
 	$normalized = array();
 
 	foreach ( $buckets as $bucket ) {
-		$slug = aspen_wallet_sanitize_bucket_slug( $bucket );
+		$slug = kitmage_wallet_sanitize_bucket_slug( $bucket );
 
 		if ( '' === $slug || isset( $normalized[ $slug ] ) ) {
 			continue;
@@ -113,7 +113,7 @@ function aspen_wallet_normalize_bucket_list( $buckets ) {
  * @param string[] $methods Candidate getter methods.
  * @return int
  */
-function aspen_wallet_get_team_int_property( $team, $methods ) {
+function kitmage_wallet_get_team_int_property( $team, $methods ) {
 	foreach ( $methods as $method ) {
 		if ( is_object( $team ) && is_callable( array( $team, $method ) ) ) {
 			$value = $team->{$method}();
@@ -135,12 +135,12 @@ function aspen_wallet_get_team_int_property( $team, $methods ) {
  * @param mixed $team Team object or ID.
  * @return int
  */
-function aspen_wallet_get_team_id( $team ) {
+function kitmage_wallet_get_team_id( $team ) {
 	if ( is_numeric( $team ) ) {
 		return absint( $team );
 	}
 
-	$team_id = aspen_wallet_get_team_int_property(
+	$team_id = kitmage_wallet_get_team_int_property(
 		$team,
 		array( 'get_id', 'get_team_id', 'get_post_id' )
 	);
@@ -170,8 +170,8 @@ function aspen_wallet_get_team_id( $team ) {
  * @param mixed $team Team object or ID.
  * @return int
  */
-function aspen_wallet_get_team_owner_id( $team ) {
-	$owner_id = aspen_wallet_get_team_int_property(
+function kitmage_wallet_get_team_owner_id( $team ) {
+	$owner_id = kitmage_wallet_get_team_int_property(
 		$team,
 		array( 'get_owner_id', 'get_owner_user_id', 'get_user_id' )
 	);
@@ -180,7 +180,7 @@ function aspen_wallet_get_team_owner_id( $team ) {
 		return $owner_id;
 	}
 
-	$team_id = aspen_wallet_get_team_id( $team );
+	$team_id = kitmage_wallet_get_team_id( $team );
 	if ( $team_id <= 0 ) {
 		return 0;
 	}
@@ -194,7 +194,7 @@ function aspen_wallet_get_team_owner_id( $team ) {
  * @param mixed $teams Raw Teams API result.
  * @return array<int,mixed>
  */
-function aspen_wallet_normalize_teams_result( $teams ) {
+function kitmage_wallet_normalize_teams_result( $teams ) {
 	if ( empty( $teams ) ) {
 		return array();
 	}
@@ -224,7 +224,7 @@ function aspen_wallet_normalize_teams_result( $teams ) {
  * @param int $user_id User ID.
  * @return array<int,mixed>
  */
-function aspen_wallet_get_user_teams( $user_id ) {
+function kitmage_wallet_get_user_teams( $user_id ) {
 	$user_id = absint( $user_id );
 
 	if ( $user_id <= 0 || ! function_exists( 'wc_memberships_for_teams_get_teams' ) ) {
@@ -238,7 +238,7 @@ function aspen_wallet_get_user_teams( $user_id ) {
 		)
 	);
 
-	return aspen_wallet_normalize_teams_result( $teams );
+	return kitmage_wallet_normalize_teams_result( $teams );
 }
 
 /**
@@ -252,19 +252,19 @@ function aspen_wallet_get_user_teams( $user_id ) {
  * @param mixed $user_id User ID.
  * @return int
  */
-function aspen_wallet_get_effective_wallet_user_id( $user_id ) {
+function kitmage_wallet_get_effective_wallet_user_id( $user_id ) {
 	$user_id = absint( $user_id );
 
 	if ( $user_id <= 0 ) {
 		return 0;
 	}
 
-	$teams          = aspen_wallet_get_user_teams( $user_id );
+	$teams          = kitmage_wallet_get_user_teams( $user_id );
 	$wallet_user_id = $user_id;
 	$selected_team  = null;
 
 	foreach ( $teams as $team ) {
-		$owner_id = aspen_wallet_get_team_owner_id( $team );
+		$owner_id = kitmage_wallet_get_team_owner_id( $team );
 
 		if ( $owner_id <= 0 ) {
 			continue;
@@ -283,7 +283,7 @@ function aspen_wallet_get_effective_wallet_user_id( $user_id ) {
 	 * @param mixed|null $selected_team  Selected team object or ID.
 	 * @param array      $teams          All team objects returned for the user.
 	 */
-	return absint( apply_filters( 'aspen_wallet_effective_wallet_user_id', $wallet_user_id, $user_id, $selected_team, $teams ) );
+	return absint( apply_filters( 'kitmage_wallet_effective_wallet_user_id', $wallet_user_id, $user_id, $selected_team, $teams ) );
 }
 
 /**
@@ -295,16 +295,16 @@ function aspen_wallet_get_effective_wallet_user_id( $user_id ) {
  */
 function wallet_get_balance( $user_id, $bucket ) {
 	$user_id = (int) $user_id;
-	$bucket  = aspen_wallet_sanitize_bucket_slug( $bucket );
+	$bucket  = kitmage_wallet_sanitize_bucket_slug( $bucket );
 
 	if ( $user_id <= 0 || '' === $bucket ) {
 		return 0;
 	}
 
-	$meta_key = aspen_wallet_bucket_meta_key( $bucket );
+	$meta_key = kitmage_wallet_bucket_meta_key( $bucket );
 	$balance  = get_user_meta( $user_id, $meta_key, true );
 
-	return aspen_wallet_to_int( $balance );
+	return kitmage_wallet_to_int( $balance );
 }
 
 /**
@@ -317,14 +317,14 @@ function wallet_get_balance( $user_id, $bucket ) {
  */
 function wallet_set_balance( $user_id, $bucket, $amount ) {
 	$user_id = (int) $user_id;
-	$bucket  = aspen_wallet_sanitize_bucket_slug( $bucket );
+	$bucket  = kitmage_wallet_sanitize_bucket_slug( $bucket );
 
 	if ( $user_id <= 0 || '' === $bucket ) {
 		return false;
 	}
 
-	$meta_key = aspen_wallet_bucket_meta_key( $bucket );
-	$parsed   = aspen_wallet_parse_int_amount( $amount );
+	$meta_key = kitmage_wallet_bucket_meta_key( $bucket );
+	$parsed   = kitmage_wallet_parse_int_amount( $amount );
 	$amount   = is_wp_error( $parsed ) ? 0 : (int) $parsed;
 	$old      = wallet_get_balance( $user_id, $bucket );
 	$updated  = false !== update_user_meta( $user_id, $meta_key, $amount );
@@ -346,7 +346,7 @@ function wallet_set_balance( $user_id, $bucket, $amount ) {
  */
 function wallet_add_balance( $user_id, $bucket, $amount ) {
 	$user_id = (int) $user_id;
-	$amount  = aspen_wallet_to_int( $amount );
+	$amount  = kitmage_wallet_to_int( $amount );
 
 	if ( $user_id <= 0 ) {
 		return false;
@@ -370,8 +370,8 @@ function wallet_add_balance( $user_id, $bucket, $amount ) {
  */
 function wallet_can_afford( $user_id, $buckets, $amount ) {
 	$user_id = (int) $user_id;
-	$amount  = aspen_wallet_to_int( $amount );
-	$buckets = aspen_wallet_normalize_bucket_list( $buckets );
+	$amount  = kitmage_wallet_to_int( $amount );
+	$buckets = kitmage_wallet_normalize_bucket_list( $buckets );
 
 	if ( $user_id <= 0 || empty( $buckets ) ) {
 		return false;
@@ -404,8 +404,8 @@ function wallet_can_afford( $user_id, $buckets, $amount ) {
  */
 function wallet_debit_balances( $user_id, $buckets, $amount ) {
 	$user_id = (int) $user_id;
-	$amount  = aspen_wallet_to_int( $amount );
-	$buckets = aspen_wallet_normalize_bucket_list( $buckets );
+	$amount  = kitmage_wallet_to_int( $amount );
+	$buckets = kitmage_wallet_normalize_bucket_list( $buckets );
 
 	$result = array(
 		'success' => false,
@@ -468,9 +468,9 @@ function wallet_debit_balances( $user_id, $buckets, $amount ) {
  * @return string
  */
 function wallet_format_balance( $amount, $divide_by = 1, $decimals = 0 ) {
-	$amount    = aspen_wallet_to_int( $amount );
-	$divide_by = aspen_wallet_to_int( $divide_by );
-	$decimals  = min( 6, aspen_wallet_to_int( $decimals ) );
+	$amount    = kitmage_wallet_to_int( $amount );
+	$divide_by = kitmage_wallet_to_int( $divide_by );
+	$decimals  = min( 6, kitmage_wallet_to_int( $decimals ) );
 
 	if ( $divide_by <= 0 ) {
 		$divide_by = 1;
@@ -482,14 +482,14 @@ function wallet_format_balance( $amount, $divide_by = 1, $decimals = 0 ) {
 }
 
 // Back-compat wrappers.
-function aspen_wallet_get_balance( $user_id, $bucket ) {
+function kitmage_wallet_get_balance( $user_id, $bucket ) {
 	return wallet_get_balance( $user_id, $bucket );
 }
 
-function aspen_wallet_set_balance( $user_id, $bucket, $amount ) {
+function kitmage_wallet_set_balance( $user_id, $bucket, $amount ) {
 	return wallet_set_balance( $user_id, $bucket, $amount );
 }
 
-function aspen_wallet_add_balance( $user_id, $bucket, $amount ) {
+function kitmage_wallet_add_balance( $user_id, $bucket, $amount ) {
 	return wallet_add_balance( $user_id, $bucket, $amount );
 }
