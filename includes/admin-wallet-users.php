@@ -180,6 +180,19 @@ function kitmage_wallet_register_users_admin_menu() {
 		'kitmage-wallet-users',
 		'kitmage_wallet_render_user_balances_page'
 	);
+
+	// Keep direct links created before the KitMage rebrand working. Registering
+	// and then removing the submenu leaves the page routable without showing a
+	// duplicate navigation item.
+	add_submenu_page(
+		'kitmage-wallet-users',
+		__( 'User Wallets', 'kitmage-wallet' ),
+		__( 'User Wallets', 'kitmage-wallet' ),
+		'edit_users',
+		'aspen-wallet-users',
+		'kitmage_wallet_render_user_balances_page'
+	);
+	remove_submenu_page( 'kitmage-wallet-users', 'aspen-wallet-users' );
 }
 
 function kitmage_wallet_render_user_balances_page() {
