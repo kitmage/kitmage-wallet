@@ -15,6 +15,7 @@ This plugin is for teams that want to:
 - **Grants Credits from WooCommerce purchases**.
 - **Supports subscription reset grants** through WooCommerce Subscriptions.
 - **Checks and debits Credits for Fluent Booking events**.
+- **Filters the Fluent Booking Team Gutenberg block** to show only events affordable with the current user's eligible Funds.
 - **Uses a team owner’s wallet for Teams for WooCommerce Memberships members**.
 - **Provides shortcodes** for balance displays and conditional content.
 

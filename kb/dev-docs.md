@@ -146,6 +146,19 @@ Sequence:
 5. Apply Fund resets.
 6. Mark renewal as processed.
 
+## Fluent Booking Team Gutenberg block filtering (`includes/fluent-booking-team-block.php`)
+
+- Registers a WordPress `render_block_data` filter, targeting `fluent-booking/team-management` on frontend HTML requests.
+- Reads the Gutenberg block's `attrs.calendarHosts` array (each host has `id` and `events`); this is the actual name used by Fluent Booking's block JavaScript and PHP render callback.
+- Expands `"all"` to active event IDs for the host's calendar; for explicit selections, queries only active events on that calendar.
+- Calls `kitmage_wallet_fluent_booking_affordability( $event_id, get_current_user_id() )` for each event. This includes team-owner wallet resolution and allows events that have no enabled wallet requirement.
+- Replaces each host's `events` with eligible IDs; drops hosts with no eligible events. If none remain, Fluent Booking's Team block renders nothing.
+- Does **not** change stored Gutenberg configuration or filter the Gutenberg editor / REST rendering. This feature concerns the Team block's **visibility**, not the underlying booking-submission authorization.
+- Avoid shared full-page caching on personalized booking pages. Cached event listings could reveal the wrong user's event choices.
+- The frontend JavaScript and event cards are built from the filtered event IDs, not merely hidden with CSS.
+- The Team and Calendar Gutenberg blocks are different block types; this filter intentionally affects only `fluent-booking/team-management`.
+- Run the regression suite with `php tests/team-block-test.php`.
+
 ## Fluent Booking Restriction Flow (`includes/fluent-booking.php`)
 Event settings UI + storage:
 - UI fields rendered in `kitmage_wallet_render_fluent_booking_event_wallet_settings()`.
