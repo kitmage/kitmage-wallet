@@ -7,7 +7,7 @@ This knowledge base article explains every KitMage Wallet shortcode, all availab
 ## Quick reference
 
 ### `[wallet_balance]`
-Display the current user’s balance for a specific Wallet Fund.
+Display the current user's balance for one Fund or the combined balance of multiple Funds.
 
 ### `[wallet_if]...[/wallet_if]`
 Conditionally render content based on the current Credits in a user’s Fund.
@@ -40,9 +40,10 @@ Use this shortcode anywhere you want to show a user how many Credits they curren
 ### Attributes
 
 - `fund` (required)
-  - The Fund slug to read from (example: `general-credits`, `coaching`, `premium`).
+  - A Fund slug or a comma-separated list (example: `general-credits,coaching`).
+  - If multiple Funds are listed, their raw Credit balances are summed before applying `divide_by`.
+  - Duplicate Funds are counted only once; unknown Funds are skipped. If none are valid, output is blank.
   - The deprecated `bucket` alias remains accepted for backward compatibility.
-  - If empty or invalid, output is blank.
 
 - `divide_by` (optional, default: `1`)
   - Lets you display a transformed value while preserving integer storage.
@@ -64,12 +65,28 @@ Use this shortcode anywhere you want to show a user how many Credits they curren
 [wallet_balance fund="general-credits"]
 ```
 
+#### Multiple Funds (combined balance)
+
+```text
+[wallet_balance fund="prepaid,subscription"]
+```
+
+If `prepaid` has 90 Credits and `subscription` has 30 Credits, this displays `120`.
+
 #### Human-friendly units
 If 100 stored credits = 1 hour:
 
 ```text
 [wallet_balance fund="coaching" divide_by="100" decimals="2" suffix="hours"]
 ```
+
+#### Combined Funds as hours
+
+```text
+[wallet_balance fund="prepaid,subscription" divide_by="60" decimals="1" suffix="Hours"]
+```
+
+With 90 prepaid Credits and 30 subscription Credits, this displays `2.0 Hours`.
 
 #### Whole-number units with label
 
@@ -242,6 +259,7 @@ If shortcode output is blank or unexpected:
 ## Best practices
 
 - Keep Fund slugs stable once used in published content.
+- Use comma-separated Fund slugs in `[wallet_balance]` to show a pooled balance; this does not change how Credits are stored or debited.
 - Prefer explicit `fallback` messages for clearer UX.
 - Use `[wallet_if]` around expensive UI blocks to avoid showing inaccessible actions.
 - Use `[wallet_balance]` near booking CTAs to reduce confusion.

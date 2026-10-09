@@ -42,14 +42,33 @@ function kitmage_wallet_shortcode_balance( $atts ) {
 	);
 
 	$fund_input = '' !== (string) $atts['fund'] ? $atts['fund'] : $atts['bucket'];
-	$fund       = kitmage_wallet_sanitize_bucket_slug( $fund_input );
-	if ( '' === $fund || ! kitmage_wallet_get_bucket_by_slug( $fund ) ) {
+	$fund_input = trim( sanitize_text_field( wp_unslash( (string) $fund_input ) ) );
+	if ( '' === $fund_input ) {
+		return '';
+	}
+
+	$funds = kitmage_wallet_normalize_bucket_list( explode( ',', $fund_input ) );
+	if ( empty( $funds ) ) {
 		return '';
 	}
 
 	$user_id        = get_current_user_id();
 	$wallet_user_id = kitmage_wallet_get_effective_wallet_user_id( $user_id );
-	$amount         = wallet_get_balance( $wallet_user_id, $fund );
+	$amount         = 0;
+	$has_valid_fund = false;
+
+	foreach ( $funds as $fund ) {
+		if ( ! kitmage_wallet_get_bucket_by_slug( $fund ) ) {
+			continue;
+		}
+
+		$has_valid_fund = true;
+		$amount        += wallet_get_balance( $wallet_user_id, $fund );
+	}
+
+	if ( ! $has_valid_fund ) {
+		return '';
+	}
 
 	$divide_by = kitmage_wallet_to_int( $atts['divide_by'] );
 	$decimals  = min( 6, kitmage_wallet_to_int( $atts['decimals'] ) );

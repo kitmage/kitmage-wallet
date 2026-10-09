@@ -65,8 +65,8 @@ This plugin is for teams that want to:
 
 ## Shortcodes
 
-- `[wallet_balance fund="your-fund"]`
-  - Display the Credits in a Fund in the current user’s Wallet.
+- `[wallet_balance fund="your-fund"]` or `[wallet_balance fund="prepaid,subscription"]`
+  - Display the Credits in one Fund, or sum Credits across comma-separated Funds in the current user’s Wallet.
 - `[wallet_if fund="your-fund" min="1"]...[/wallet_if]`
   - Render content only when a balance condition passes.
 - `[wallet_booking event_id="123" fallback="Not enough credits."]`
