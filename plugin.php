@@ -56,6 +56,7 @@ function kitmage_wallet_load_modules() {
 	require_once KITMAGE_WALLET_PATH . 'includes/woo.php';
 	require_once KITMAGE_WALLET_PATH . 'includes/subscriptions.php';
 	require_once KITMAGE_WALLET_PATH . 'includes/fluent-booking.php';
+	require_once KITMAGE_WALLET_PATH . 'includes/fluent-booking-team-block.php';
 	require_once KITMAGE_WALLET_PATH . 'includes/shortcodes.php';
 }
 
@@ -72,6 +73,7 @@ function kitmage_wallet_bootstrap() {
 	kitmage_wallet_register_woo_hooks();
 	kitmage_wallet_register_subscription_hooks();
 	kitmage_wallet_register_fluent_booking_hooks();
+	kitmage_wallet_register_fluent_booking_team_block_hooks();
 	kitmage_wallet_register_shortcode_hooks();
 }
 add_action( 'plugins_loaded', 'kitmage_wallet_bootstrap' );
