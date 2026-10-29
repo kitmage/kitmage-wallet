@@ -32,7 +32,7 @@ function kitmage_wallet_get_buckets() {
 		$clean[] = array(
 			'label'       => isset( $bucket['label'] ) ? sanitize_text_field( $bucket['label'] ) : $slug,
 			'slug'        => $slug,
-			'description'          => isset( $bucket['description'] ) ? sanitize_textarea_field( $bucket['description'] ) : '',
+			'description'         => isset( $bucket['description'] ) ? sanitize_textarea_field( $bucket['description'] ) : '',
 			'redeem_url'           => isset( $bucket['redeem_url'] ) ? esc_url_raw( $bucket['redeem_url'] ) : '',
 			'redeem_instructions'  => isset( $bucket['redeem_instructions'] ) ? sanitize_textarea_field( $bucket['redeem_instructions'] ) : '',
 			'redeem_button_text'   => isset( $bucket['redeem_button_text'] ) ? sanitize_text_field( $bucket['redeem_button_text'] ) : '',
@@ -60,13 +60,13 @@ function kitmage_wallet_get_bucket_by_slug( $slug ) {
 function kitmage_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
 	$bucket = is_array( $bucket ) ? $bucket : array();
 
-	$label       = isset( $bucket['label'] ) ? sanitize_text_field( $bucket['label'] ) : '';
-	$description = isset( $bucket['description'] ) ? sanitize_textarea_field( $bucket['description'] ) : '';
-	$redeem_url = isset( $bucket['redeem_url'] ) ? esc_url_raw( $bucket['redeem_url'] ) : '';
+	$label               = isset( $bucket['label'] ) ? sanitize_text_field( $bucket['label'] ) : '';
+	$description         = isset( $bucket['description'] ) ? sanitize_textarea_field( $bucket['description'] ) : '';
+	$redeem_url          = isset( $bucket['redeem_url'] ) ? esc_url_raw( $bucket['redeem_url'] ) : '';
 	$redeem_instructions = isset( $bucket['redeem_instructions'] ) ? sanitize_textarea_field( $bucket['redeem_instructions'] ) : '';
-	$redeem_button_text = isset( $bucket['redeem_button_text'] ) ? sanitize_text_field( $bucket['redeem_button_text'] ) : '';
-	$slug        = isset( $bucket['slug'] ) ? kitmage_wallet_sanitize_bucket_slug( $bucket['slug'] ) : '';
-	$original_slug = kitmage_wallet_sanitize_bucket_slug( $original_slug );
+	$redeem_button_text  = isset( $bucket['redeem_button_text'] ) ? sanitize_text_field( $bucket['redeem_button_text'] ) : '';
+	$slug                = isset( $bucket['slug'] ) ? kitmage_wallet_sanitize_bucket_slug( $bucket['slug'] ) : '';
+	$original_slug       = kitmage_wallet_sanitize_bucket_slug( $original_slug );
 
 	if ( '' === $slug ) {
 		return new WP_Error( 'invalid_slug', __( 'Fund slug is required.', 'kitmage-wallet' ) );
