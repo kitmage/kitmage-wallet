@@ -2,7 +2,7 @@
 /**
  * Plugin Name: KitMage Wallet
  * Description: A fund-based credit wallet for WooCommerce, WooCommerce Subscriptions, Fluent Booking, and FluentCRM.
- * Version: 0.1.2
+ * Version: 0.1.3
  * Plugin URI: https://kitmage.com
  * Author: Mike@KitMage
  * Author URI: https://kitmage.com
@@ -22,7 +22,7 @@ if ( ! defined( 'KITMAGE_WALLET_PATH' ) ) {
 }
 
 if ( ! defined( 'KITMAGE_WALLET_VERSION' ) ) {
-	define( 'KITMAGE_WALLET_VERSION', '0.1.2' );
+	define( 'KITMAGE_WALLET_VERSION', '0.1.3' );
 }
 
 /**
