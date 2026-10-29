@@ -104,6 +104,27 @@ Nonces used:
 | User profile wallet save (admin editing user) | `edit_user_profile_update` | `kitmage_wallet_handle_profile_wallet_save()` |
 
 ## WooCommerce Granting Model (`includes/woo.php`)
+### Post-Purchase Redemption Guidance (`includes/order-guidance.php`)
+
+Fund Types now have three optional fields in the existing `kitmage_wallet_buckets` option, edited through the existing Fund form in `includes/admin.php`:
+
+- `redeem_url`: sanitized URL for the Fund-specific booking destination.
+- `redeem_instructions`: plain-text directions; line breaks retained.
+- `redeem_button_text`: button label, defaulting to “Book with your Credits”.
+
+`kitmage_wallet_get_buckets()` defaults old Fund records to empty fields, and `kitmage_wallet_upsert_bucket()` preserves settings on updates. Products automatically inherit their Fund's directions.
+
+Hooks registered by `kitmage_wallet_register_order_guidance_hooks()`:
+- `woocommerce_checkout_create_order_line_item` (4 arguments): add `_kitmage_wallet_order_item_grants` order-item meta to snapshot purchase-time grants **for display only**.
+- `woocommerce_before_thankyou` and `woocommerce_thankyou`: show one card on classic or block confirmation, verifying logged-in ownership or the WooCommerce order key.
+- `woocommerce_view_order`: show the shared card in My Account order details to the authenticated order owner.
+
+`kitmage_wallet_order_guidance_funds()` deduplicates eligible grants by Fund. It prefers purchase-time snapshots, falls back to current product grants on old order items, and also reads the existing applied-grant details for historic one-time orders after product changes.
+
+Cancelled/failed/refunded and unpaid orders, and orders with no linked WordPress account, display a status/help note without booking buttons. For paid orders, one-time grants require a confirmed applied entry in `_kitmage_wallet_one_time_grants_applied_details` before a redemption CTA appears; otherwise the card says credits are being prepared. Subscription-reset grants show configured directions with an explicit caveat that subscription Credits must be available. No balance mutation occurs.
+
+Run `php tests/order-guidance-test.php` and `php tests/fund-redemption-test.php` for regression coverage.
+
 Per-product grant metadata:
 - Stored in post meta key `KITMAGE_WALLET_PRODUCT_GRANTS_META_KEY` (`_kitmage_wallet_grants`).
 - Written by `kitmage_wallet_woo_save_product_wallet_meta()` and `kitmage_wallet_woo_save_variation_wallet_meta()`.

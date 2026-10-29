@@ -2,7 +2,7 @@
 /**
  * Plugin Name: KitMage Wallet
  * Description: A fund-based credit wallet for WooCommerce, WooCommerce Subscriptions, Fluent Booking, and FluentCRM.
- * Version: 0.1.2
+ * Version: 0.1.3
  * Plugin URI: https://kitmage.com
  * Author: Mike@KitMage
  * Author URI: https://kitmage.com
@@ -22,7 +22,7 @@ if ( ! defined( 'KITMAGE_WALLET_PATH' ) ) {
 }
 
 if ( ! defined( 'KITMAGE_WALLET_VERSION' ) ) {
-	define( 'KITMAGE_WALLET_VERSION', '0.1.2' );
+	define( 'KITMAGE_WALLET_VERSION', '0.1.3' );
 }
 
 /**
@@ -54,6 +54,7 @@ function kitmage_wallet_load_modules() {
 	require_once KITMAGE_WALLET_PATH . 'includes/admin.php';
 	require_once KITMAGE_WALLET_PATH . 'includes/admin-wallet-users.php';
 	require_once KITMAGE_WALLET_PATH . 'includes/woo.php';
+	require_once KITMAGE_WALLET_PATH . 'includes/order-guidance.php';
 	require_once KITMAGE_WALLET_PATH . 'includes/subscriptions.php';
 	require_once KITMAGE_WALLET_PATH . 'includes/fluent-booking.php';
 	require_once KITMAGE_WALLET_PATH . 'includes/fluent-booking-team-block.php';
@@ -71,6 +72,7 @@ function kitmage_wallet_bootstrap() {
 	kitmage_wallet_register_admin_hooks();
 	kitmage_wallet_register_admin_wallet_users_hooks();
 	kitmage_wallet_register_woo_hooks();
+	kitmage_wallet_register_order_guidance_hooks();
 	kitmage_wallet_register_subscription_hooks();
 	kitmage_wallet_register_fluent_booking_hooks();
 	kitmage_wallet_register_fluent_booking_team_block_hooks();

@@ -45,6 +45,9 @@ function kitmage_wallet_render_admin_page() {
 		'label'       => '',
 		'slug'        => '',
 		'description' => '',
+		'redeem_url' => '',
+		'redeem_instructions' => '',
+		'redeem_button_text' => '',
 	);
 	$is_editing     = false;
 	$editing_bucket = kitmage_wallet_get_bucket_by_slug( $editing );
@@ -133,6 +136,22 @@ function kitmage_wallet_render_admin_page() {
 				<tr>
 					<th scope="row"><label for="kitmage_wallet_description"><?php echo esc_html__( 'Description', 'kitmage-wallet' ); ?></label></th>
 					<td><textarea id="kitmage_wallet_description" name="bucket[description]" class="large-text" rows="3"><?php echo esc_textarea( $bucket['description'] ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row" colspan="2"><h3><?php echo esc_html__( 'After-purchase redemption instructions', 'kitmage-wallet' ); ?></h3>
+					<p class="description"><?php echo esc_html__( 'Shown on order confirmation and My Account order details for products granting Credits to this Fund. Leave the URL empty to omit the booking button.', 'kitmage-wallet' ); ?></p></th>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kitmage_wallet_redeem_url"><?php echo esc_html__( 'Redemption page URL', 'kitmage-wallet' ); ?></label></th>
+					<td><input id="kitmage_wallet_redeem_url" name="bucket[redeem_url]" type="url" class="large-text" placeholder="https://example.com/book/" value="<?php echo esc_attr( $bucket['redeem_url'] ); ?>" /></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kitmage_wallet_redeem_instructions"><?php echo esc_html__( 'Customer instructions', 'kitmage-wallet' ); ?></label></th>
+					<td><textarea id="kitmage_wallet_redeem_instructions" name="bucket[redeem_instructions]" class="large-text" rows="3" placeholder="<?php echo esc_attr__( 'Visit the booking page and choose a session to use your minutes.', 'kitmage-wallet' ); ?>"><?php echo esc_textarea( $bucket['redeem_instructions'] ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="kitmage_wallet_redeem_button_text"><?php echo esc_html__( 'Button label', 'kitmage-wallet' ); ?></label></th>
+					<td><input id="kitmage_wallet_redeem_button_text" name="bucket[redeem_button_text]" type="text" class="regular-text" placeholder="<?php echo esc_attr__( 'Book with your credits', 'kitmage-wallet' ); ?>" value="<?php echo esc_attr( $bucket['redeem_button_text'] ); ?>" /></td>
 				</tr>
 			</table>
 			<?php submit_button( $is_editing ? __( 'Update Fund', 'kitmage-wallet' ) : __( 'Add Fund', 'kitmage-wallet' ) ); ?>
