@@ -41,8 +41,9 @@ This plugin is for teams that want to:
 1. Go to **Wallet** in WordPress Admin and create your first Funds.
 2. Open WooCommerce products and configure Wallet grants (Fund + Credits).
 3. (Optional) Set subscription reset grants on subscription products.
-4. Configure Wallet rules in Fluent Booking events (enable the Wallet, set the Credit cost, and choose allowed Funds).
-5. Test with a customer account:
+4. For each Fund, optionally set its **after-purchase redemption URL**, customer instructions, and button label in **Wallet → Fund Types**.
+5. Configure Wallet rules in Fluent Booking events (enable the Wallet, set the Credit cost, and choose allowed Funds).
+6. Test with a customer account:
    - Purchase a product that grants Credits.
    - Verify balance updates.
    - Attempt a booking that costs Credits.
@@ -63,6 +64,18 @@ This plugin is for teams that want to:
 - User Wallet and Credit management from wp-admin.
 - Profile-level Credit editing (with capability checks).
 - Booking restriction and debit rules tied to event settings.
+
+## After-purchase guidance
+
+On a WooCommerce order containing Wallet Credits, KitMage Wallet shows a **What's next?** card on the thank-you page and My Account → View Order. It groups items by **Fund**, so a mixed order can show multiple redemption destinations.
+
+Configure each Fund at **Wallet → Fund Types → Edit**:
+
+- **Redemption page URL**: the booking/redemption page (optional).
+- **Customer instructions**: plain-text guidance for using Credits or minutes; line breaks are kept.
+- **Button label**: optional, defaulting to “Book with your Credits” when a URL exists.
+
+Products inherit these directions from their configured Fund grants. Existing Funds continue working without a destination until one is configured. Unpaid, failed, cancelled, refunded, or unmapped orders receive status/help messages, not redemption links. One-time grants show links only when confirmed in the order's applied-grant details; subscription-reset grants include a note that Credits must be available. New checkout items snapshot their Fund grants for historically reliable instructions; legacy orders fall back to applied-grant records or current product settings. The card does not change balances.
 
 ## Shortcodes
 
