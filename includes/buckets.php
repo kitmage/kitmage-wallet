@@ -87,12 +87,9 @@ function kitmage_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
 	foreach ( $buckets as $existing ) {
 		if ( $existing['slug'] === $original_slug && '' !== $original_slug ) {
 			$next[]     = array(
-				'label'       => $label,
-				'slug'        => $slug,
+				'label' => $label,
+				'slug' => $slug,
 				'description' => $description,
-			'redeem_url' => $redeem_url,
-			'redeem_instructions' => $redeem_instructions,
-			'redeem_button_text' => $redeem_button_text,
 				'redeem_url' => $redeem_url,
 				'redeem_instructions' => $redeem_instructions,
 				'redeem_button_text' => $redeem_button_text,
@@ -110,8 +107,8 @@ function kitmage_wallet_upsert_bucket( $bucket, $original_slug = '' ) {
 
 	if ( ! $did_update ) {
 		$next[] = array(
-			'label'       => $label,
-			'slug'        => $slug,
+			'label' => $label,
+			'slug' => $slug,
 			'description' => $description,
 			'redeem_url' => $redeem_url,
 			'redeem_instructions' => $redeem_instructions,
