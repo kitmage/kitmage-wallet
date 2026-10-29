@@ -212,7 +212,6 @@ function kitmage_wallet_order_guidance_render( $order ) {
 					<?php endif; ?>
 				</div>
 			<?php endforeach; ?>
-			<p><?php esc_html_e( 'Sign in with the account used for this purchase to access your Wallet Credits.', 'kitmage-wallet' ); ?></p>
 		<?php endif; ?>
 	</section>
 	<?php
